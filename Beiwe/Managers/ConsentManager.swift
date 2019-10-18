@@ -8,6 +8,7 @@
 
 import Foundation
 import ResearchKit
+import UserNotifications
 
 
 enum StepIds : String {
@@ -37,10 +38,10 @@ class WaitForPermissionsRule : ORKStepNavigationRule {
 class ConsentManager : NSObject, ORKTaskViewControllerDelegate {
 
 
-    let pscope = AppDelegate.sharedInstance().pscope;
     var retainSelf: AnyObject?;
     var consentViewController: ORKTaskViewController!;
     var consentDocument: ORKConsentDocument!;
+    var permissionsGranted: Bool = false;
 
     var PermissionsStep: ORKStep {
         let instructionStep = ORKInstructionStep(identifier: StepIds.Permission.rawValue)
@@ -135,9 +136,11 @@ class ConsentManager : NSObject, ORKTaskViewControllerDelegate {
         //let waitForPermissionRule = WaitForPermissionsRule(coder: NSCoder())
         //task.setNavigationRule(waitForPermissionRule!, forTriggerStepIdentifier: StepIds.WaitForPermissions.rawValue)
         task.setNavigationRule(WaitForPermissionsRule() { [weak self] taskResult -> String in
-            if (self?.pscope.statusLocationAlways() == .authorized) {
+            if (self?.permissionsGranted == true) {
+                print("Yeah, permissions are granted!")
                 return StepIds.VisualConsent.rawValue
             } else {
+                print("No, permissions are NOT granted.")
                 return StepIds.WarningStep.rawValue
             }
 
@@ -154,7 +157,8 @@ class ConsentManager : NSObject, ORKTaskViewControllerDelegate {
     }
 
     func hasRequiredPermissions() -> Bool {
-        return (pscope.statusNotifications() == .authorized && pscope.statusLocationAlways() == .authorized);
+//        return self.permissionsGranted  // TODO: previously used (pscope.statusNotifications() == .authorized && pscope.statusLocationAlways() == .authorized)
+        return false;  // TODO: fix this
     }
 
     /* ORK Delegates */
@@ -220,24 +224,41 @@ class ConsentManager : NSObject, ORKTaskViewControllerDelegate {
         if let identifier = StepIds(rawValue: stepViewController.step?.identifier ?? "") {
             switch(identifier) {
             case .WaitForPermissions:
-                pscope.show({ finished, results in
-                    log.info("Permissions granted");
-                    if (self.hasRequiredPermissions()) {
-                        stepViewController.goForward();
+                print("Here we are in the .WaitForPermission step");
+
+                let center = UNUserNotificationCenter.current()
+                center.requestAuthorization(options: [.sound, .alert, .badge]) { (granted, error) in  // TODO: .sound may be unnecessary
+                    if error == nil {
+                        print("Did not error during the permissions request");
+                        center.getNotificationSettings { settings in
+                            if settings.authorizationStatus == .authorized {
+                                print("Yeah, seem to be authorized.");
+                                self.permissionsGranted = true
+                                stepViewController.goForward();
+                            } else {
+                                print("Seems to have been declined.");
+                                self.permissionsGranted = false
+                                stepViewController.goForward();
+                            }
+                        }
                     }
-                    }, cancelled: { (results) in
-                        log.info("Permissions cancelled");
-                        stepViewController.goForward();
-                })
+                    else {
+                        print("Error during the permissions request");
+                    }
+                }
             case .Permission:
+                print("Here we are in the .Permission step");
                 stepViewController.continueButtonTitle = NSLocalizedString("continue_to_permissions_button_title", comment: "");
             case .WarningStep:
-                if (pscope.statusLocationAlways() == .authorized) {
-                    stepViewController.goForward();
-                } else {
-                    stepViewController.continueButtonTitle = NSLocalizedString("continue_button_title", comment: "");
-                }
+                log.info("Here we are in the .WarningStep");
+                // TODO: make the 4 lines below work
+//                if self.permissionsGranted == true {  // TODO: previously, this used if (pscope.statusLocationAlways() == .authorized)
+//                    stepViewController.goForward();
+//                } else {
+//                    stepViewController.continueButtonTitle = NSLocalizedString("continue_button_title", comment: "");
+//                }
             case .VisualConsent:
+                print("Here we are in the .VisualConsent step");
                 if (hasRequiredPermissions()) {
                     stepViewController.backButtonItem = nil;
                 }
