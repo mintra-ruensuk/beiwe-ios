@@ -6,6 +6,7 @@
 //  Copyright © 2016 Rocketfarm Studios. All rights reserved.
 //
 
+import CoreLocation
 import Foundation
 import ResearchKit
 import UserNotifications
@@ -35,13 +36,15 @@ class WaitForPermissionsRule : ORKStepNavigationRule {
     }
 }
 
-class ConsentManager : NSObject, ORKTaskViewControllerDelegate {
+class ConsentManager : NSObject, ORKTaskViewControllerDelegate, CLLocationManagerDelegate {
 
 
     var retainSelf: AnyObject?;
     var consentViewController: ORKTaskViewController!;
     var consentDocument: ORKConsentDocument!;
     var permissionsGranted: Bool = false;
+    let notificationCenter = UNUserNotificationCenter.current()
+
 
     var PermissionsStep: ORKStep {
         let instructionStep = ORKInstructionStep(identifier: StepIds.Permission.rawValue)
@@ -218,6 +221,19 @@ class ConsentManager : NSObject, ORKTaskViewControllerDelegate {
         return nil;
     }
 
+    func recordWhetherPermissionsAreGranted() {
+        print("At least we got here!")
+        notificationCenter.getNotificationSettings { settings in
+            if settings.authorizationStatus == .authorized {
+                print("Yeah, notifications are authorized.")
+                self.permissionsGranted = true
+            } else {
+                print("Nope, notifications are declined.")
+                self.permissionsGranted = false
+            }
+        }
+    }
+    
     func taskViewController(_ taskViewController: ORKTaskViewController, stepViewControllerWillAppear stepViewController: ORKStepViewController) {
         stepViewController.cancelButtonItem!.title = NSLocalizedString("unregister_alert_title", comment: "")
 
@@ -226,26 +242,42 @@ class ConsentManager : NSObject, ORKTaskViewControllerDelegate {
             case .WaitForPermissions:
                 print("Here we are in the .WaitForPermission step");
 
-                let center = UNUserNotificationCenter.current()
-                center.requestAuthorization(options: [.sound, .alert, .badge]) { (granted, error) in  // TODO: .sound may be unnecessary
-                    if error == nil {
-                        print("Did not error during the permissions request");
-                        center.getNotificationSettings { settings in
-                            if settings.authorizationStatus == .authorized {
-                                print("Yeah, seem to be authorized.");
-                                self.permissionsGranted = true
-                                stepViewController.goForward();
-                            } else {
-                                print("Seems to have been declined.");
-                                self.permissionsGranted = false
-                                stepViewController.goForward();
-                            }
+                DispatchQueue.main.async(execute: {
+                    self.notificationCenter.requestAuthorization(options: [.sound, .alert, .badge]) { (granted, error) in  // TODO: .sound may be unnecessary
+                        if error == nil {
+                            print("Did not error during the permissions request");
+//                            self.recordWhetherPermissionsAreGranted()
+                            stepViewController.goForward()
                         }
-                    }
-                    else {
-                        print("Error during the permissions request");
-                    }
-                }
+                        else {
+                            print("Error during the permissions request");
+                        }}
+                })
+//                notificationCenter.requestAuthorization(options: [.sound, .alert, .badge]) { (granted, error) in  // TODO: .sound may be unnecessary
+//                    if error == nil {
+//                        print("Did not error during the permissions request");
+//                        self.recordWhetherPermissionsAreGranted()
+//                        stepViewController.goForward()
+//                        center.getNotificationSettings { settings in
+//                            if settings.authorizationStatus == .authorized {
+//                                print("Yeah, seem to be authorized.");
+//                                self.permissionsGranted = true
+//
+//                                let locationManager = CLLocationManager()
+//                                locationManager.requestAlwaysAuthorization()
+//
+//                                stepViewController.goForward();
+//                            } else {
+//                                print("Seems to have been declined.");
+//                                self.permissionsGranted = false
+//                                stepViewController.goForward();
+//                            }
+//                        }
+//                    }
+//                    else {
+//                        print("Error during the permissions request");
+//                    }
+//                }
             case .Permission:
                 print("Here we are in the .Permission step");
                 stepViewController.continueButtonTitle = NSLocalizedString("continue_to_permissions_button_title", comment: "");
