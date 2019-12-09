@@ -11,6 +11,7 @@ import PromiseKit
 import ReachabilitySwift
 import EmitterKit
 import Crashlytics
+import UserNotifications
 
 class StudyManager {
     static let sharedInstance = StudyManager();
@@ -436,9 +437,6 @@ class StudyManager {
                                 
                             }
 
-                            let localNotif = UILocalNotification();
-                            localNotif.fireDate = currentDate;
-
                             var body: String;
                             switch(surveyType) {
                             case .TrackingSurvey:
@@ -447,17 +445,24 @@ class StudyManager {
                                 body = NSLocalizedString("audio_survey_notification_text", comment: "")
                             }
 
-                            localNotif.alertBody = body;
-                            localNotif.soundName = UILocalNotificationDefaultSoundName;
-                            localNotif.userInfo = [
+                            let notifCenter = UNUserNotificationCenter.current()
+                            let notifContent = UNMutableNotificationContent()
+                            notifContent.body = body
+                            notifContent.sound = UNNotificationSound.default()
+                            notifContent.userInfo = [
                                 "type": "survey",
                                 "survey_type": surveyType.rawValue,
                                 "survey_id": id
-                            ];
-                            log.info("Sending Survey notif: \(body), \(localNotif.userInfo)")
-                            UIApplication.shared.scheduleLocalNotification(localNotif);
-                            activeSurvey.notification = localNotif;
+                            ]
 
+                            // FIXME: make this next line work
+                            // activeSurvey.notification = localNotif;
+                            let identifier = "BeiweSurveyLocalNotification"
+                            let request = UNNotificationRequest(identifier: identifier, content: notifContent, trigger: nil)
+                            notifCenter.add(request, withCompletionHandler: { (error) in
+                                if error != nil {
+                                }
+                            })
                         }
 
                     }
