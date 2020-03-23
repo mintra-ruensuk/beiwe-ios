@@ -76,7 +76,7 @@ class AudioQuestionViewController: UIViewController, AVAudioRecorderDelegate, AV
         if let study = StudyManager.sharedInstance.currentStudy {
             // Just need to put any old answer in here...
             activeSurvey.bwAnswers["A"] = "A"
-            Recline.shared.save(study).then {_ in
+            Recline.shared.save(study).done {_ in
                 log.info("Saved.");
                 }.catch { e in
                     log.error("Error saving updated answers: \(e)");
@@ -295,7 +295,7 @@ class AudioQuestionViewController: UIViewController, AVAudioRecorderDelegate, AV
         HUD.show(.labeledProgress(title: "Saving", subtitle: ""))
         AppEventManager.sharedInstance.logAppEvent(event: "audio_save", msg: "Save audio pressed")
 
-         saveEncryptedAudio().then { _ -> Void in
+         saveEncryptedAudio().done { _ -> Void in
             self.activeSurvey.isComplete = true;
             StudyManager.sharedInstance.cleanupSurvey(self.activeSurvey)
             StudyManager.sharedInstance.updateActiveSurveys(true);

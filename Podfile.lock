@@ -47,7 +47,7 @@ DEPENDENCIES:
   - KeychainSwift (~> 8.0)
   - ObjectMapper (from `https://github.com/Hearst-DD/ObjectMapper.git`, branch `master`)
   - PKHUD (from `https://github.com/pkluz/PKHUD.git`, branch `swift4`)
-  - PromiseKit
+  - PromiseKit (~> 6)
   - ReachabilitySwift (~> 3)
   - ResearchKit
   - SwiftValidator (from `https://github.com/jpotts18/SwiftValidator.git`, branch `master`)
@@ -119,6 +119,6 @@ SPEC CHECKSUMS:
   XCGLogger: 1943831ef907df55108b0b18657953f868de973b
   XLActionController: f1f2226d2c6629db197d4a41f2da907085a4cb9d
 
-PODFILE CHECKSUM: d20f476ccff8e7765028d6977c5345441f33abc9
+PODFILE CHECKSUM: fedc7d4ac80f74c19b8a4e5bde809c6d21494f8f
 
 COCOAPODS: 1.9.1

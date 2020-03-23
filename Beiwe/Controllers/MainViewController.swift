@@ -218,7 +218,7 @@ class MainViewController: UIViewController {
         alertController.addAction(cancelAction)
 
         let OKAction = UIAlertAction(title: NSLocalizedString("ok_button_text", comment: ""), style: .default) { (action) in
-            StudyManager.sharedInstance.leaveStudy().then {_ -> Void in
+            StudyManager.sharedInstance.leaveStudy().done {_ -> Void in
                 AppDelegate.sharedInstance().isLoggedIn = false;
                 AppDelegate.sharedInstance().transitionToCurrentAppState();
             }

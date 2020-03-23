@@ -376,7 +376,7 @@ class TrackingSurveyPresenter : NSObject, ORKTaskViewControllerDelegate {
         if (!isComplete) {
             activeSurvey?.rkAnswers = taskViewController.restorationData;
             if let study = StudyManager.sharedInstance.currentStudy {
-                Recline.shared.save(study).then {_ in
+                Recline.shared.save(study).done {_ in
                     log.info("Tracking survey Saved.");
                     }.catch {_ in
                         log.error("Error saving updated answers.");

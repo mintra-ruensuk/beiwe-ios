@@ -4,7 +4,7 @@ target 'Beiwe' do
   use_frameworks!
   pod 'Crashlytics', '~> 3.4'
   pod 'KeychainSwift', '~> 8.0'
-  pod "PromiseKit"
+  pod "PromiseKit", '~> 6'
   pod 'Alamofire', '~> 4.5'
   pod 'ObjectMapper', :git => 'https://github.com/Hearst-DD/ObjectMapper.git', :branch => 'master'
   pod 'Eureka'

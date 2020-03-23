@@ -128,7 +128,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Recline.shared.open().then { _ -> Promise<Bool> in
             print("Database opened");
             return StudyManager.sharedInstance.loadDefaultStudy();
-            }.then { _ -> Void in
+            }.done { _ -> Void in
                 self.transitionToCurrentAppState();
             }.catch { err -> Void in
                 print("Database open failed.");
@@ -265,7 +265,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let dispatchGroup = DispatchGroup();
 
         dispatchGroup.enter()
-        StudyManager.sharedInstance.stop().then(on: DispatchQueue.global(qos: .default)) { _ in
+        StudyManager.sharedInstance.stop().done(on: DispatchQueue.global(qos: .default)) { _ in
             dispatchGroup.leave()
             }.catch(on: DispatchQueue.global(qos: .default)) {_ in 
                 dispatchGroup.leave()

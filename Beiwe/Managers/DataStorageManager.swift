@@ -536,7 +536,7 @@ class DataStorageManager {
                 }
                 /* Need to flush again, because there is (very slim) one of those files was created after the flush */
                 return self._flushAll()
-            }.then(on: prepQ) {
+            }.then(on: prepQ) { 
                 for filename in filesToUpload {
                     let src = DataStorageManager.currentDataDirectory().appendingPathComponent(filename);
                     let dst = DataStorageManager.uploadDataDirectory().appendingPathComponent(filename);
