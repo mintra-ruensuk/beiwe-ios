@@ -247,10 +247,12 @@ class AudioQuestionViewController: UIViewController, AVAudioRecorderDelegate, AV
     }
 
     func writeSomeData(_ handle: FileHandle, encFile: EncryptedStorage) -> Promise<Void> {
-        return Promise().then(on: DispatchQueue.global(qos: .background)) {
+        return Promise().then(on: DispatchQueue.global(qos: .background)) {_ -> Promise<Void> in
+            // closure return
             let data: Data = handle.readData(ofLength: self.OUTPUT_CHUNK_SIZE)
             if (data.count > 0) {
                 return encFile.write(data as NSData, writeLen: data.count).then {
+                    // closure recur
                     return self.writeSomeData(handle, encFile: encFile)
                 }
             }

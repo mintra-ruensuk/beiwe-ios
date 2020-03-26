@@ -135,7 +135,7 @@ class StudyManager {
 
     func setConsented() -> Promise<Bool> {
         guard let study = currentStudy, let studySettings = study.studySettings else {
-            return Promise(value: false);
+            return .value(false)
         }
         setApiCredentials()
         let currentTime: Int64 = Int64(Date().timeIntervalSince1970);
@@ -171,14 +171,16 @@ class StudyManager {
         } else {
             promise = Promise();
         }
-
-        return promise.then(on: DispatchQueue.global(qos: .default)) {
+        
+        return promise.then(on: DispatchQueue.global(qos: .default)) { _ -> Promise<Bool> in
             //self.gpsManager = nil;
             self.currentStudy = nil;
-            return Promise(value: true)
-            }.catch(on: DispatchQueue.global(qos: .default)) {_ in
-                print("Caught err")
+            return .value(true)
         }
+        // catch is not needed since we are just assigning
+//        .catch(on: DispatchQueue.global(qos: .default)) {_ in
+//                print("Caught err")
+//        }
 
     }
 
@@ -201,7 +203,7 @@ class StudyManager {
 
 
         UIApplication.shared.cancelAllLocalNotifications()
-        return promise.then {
+        return promise.then { _ -> Promise<Bool> in
             self.gpsManager = nil;
                 return self.purgeStudies().then { _ -> Promise<Bool> in
                 let fileManager = FileManager.default
@@ -229,7 +231,7 @@ class StudyManager {
                 
                 self.currentStudy = nil;
                 
-                return Promise(value: true);
+                return .value(true)
                 
             }
         }
@@ -517,7 +519,7 @@ class StudyManager {
 
     func checkSurveys() -> Promise<Bool> {
         guard let study = currentStudy, let studySettings = study.studySettings else {
-            return Promise(value: false);
+            return .value(false)
         }
         log.info("Checking for surveys...");
         return Recline.shared.save(study).then { _ -> Promise<([Survey], Int)> in
@@ -531,30 +533,29 @@ class StudyManager {
                 self.updateActiveSurveys();
                 return Promise(value: true);
             }.recover { _ -> Promise<Bool> in
-                return Promise(value: false);
+                return .value(false);
         }
 
     }
 
     func setNextUploadTime() -> Promise<Bool> {
         guard let study = currentStudy, let studySettings = study.studySettings else {
-            return Promise(value: true);
+            return .value(true)
         }
 
         study.nextUploadCheck = Int64(Date().timeIntervalSince1970) +  Int64(studySettings.uploadDataFileFrequencySeconds);
         return Recline.shared.save(study).then { _ -> Promise<Bool> in
-            return Promise(value: true);
+            return .value(true)
         }
     }
 
     func setNextSurveyTime() -> Promise<Bool> {
-        guard let study = currentStudy, let studySettings = study.studySettings else {
-            return Promise(value: true);
+        guard let study = currentStudy, let studySettings = study.studySettings else {            return .value(true)
         }
 
         study.nextSurveyCheck = Int64(Date().timeIntervalSince1970) + Int64(studySettings.checkForNewSurveysFreqSeconds)
         return Recline.shared.save(study).then { _ -> Promise<Bool> in
-            return Promise(value: true);
+            return .value(true)
         }
 
     }
@@ -579,7 +580,7 @@ class StudyManager {
 
     func purgeUploadData(_ fileList: [String:Int64], currentStorageUse: Int64) -> Promise<Void> {
         var used = currentStorageUse
-        return Promise().then(on: DispatchQueue.global(qos: .default)) {
+        return Promise().then(on: DispatchQueue.global(qos: .default)) { _ -> Promise<Void> in
             log.error("EXCESSIVE STORAGE USED, used: \(currentStorageUse), WifiAvailable: \(self.appDelegate.reachability!.isReachableViaWiFi)")
             log.error("Last success: \(self.currentStudy?.lastUploadSuccess)")
             for (filename, len) in fileList {
@@ -619,7 +620,7 @@ class StudyManager {
     }
 
     func clearTempFiles() -> Promise<Void> {
-        return Promise().then(on: DispatchQueue.global(qos: .default)) {
+        return Promise().then(on: DispatchQueue.global(qos: .default)) { _ -> Promise<Void> in
             do {
                 let alamoTmpDir = NSURL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("com.alamofire.manager")!.appendingPathComponent("multipart.form.data")
                 try FileManager.default.removeItem(at: alamoTmpDir)
@@ -640,9 +641,9 @@ class StudyManager {
         var promiseChain: Promise<Bool>
 
         promiseChain = Recline.shared.compact().then { _ -> Promise<Bool> in
-            return DataStorageManager.sharedInstance.prepareForUpload().then {
+            return DataStorageManager.sharedInstance.prepareForUpload().then { _ -> Promise<Bool> in
                 log.info("prepareForUpload finished")
-                return Promise(value: true)
+                return .value(true)
             };
         }
 
@@ -655,7 +656,8 @@ class StudyManager {
         return promiseChain.then(on: q) { (_: Bool) -> Promise<Bool> in
             let fileManager = FileManager.default
             let enumerator = fileManager.enumerator(atPath: DataStorageManager.uploadDataDirectory().path)
-            var uploadChain = Promise<Bool>(value: true)
+//            var uploadChain = Promise<Bool>(value: true)
+            var uploadChain = Promise<Bool>.value(true)
             if let enumerator = enumerator {
                 while let filename = enumerator.nextObject() as? String {
                     if (DataStorageManager.sharedInstance.isUploadFile(filename)) {
@@ -686,13 +688,13 @@ class StudyManager {
                         }
                     }.recover { error -> Promise<Bool> in
                         AppEventManager.sharedInstance.logAppEvent(event: "upload_file_failed", msg: "Failed Uploaded data file", d1: filename)
-                        return Promise(value: true)
+                        return .value(true)
                     }
                 }
                 return uploadChain
             } else {
                 log.info("Skipping upload, processing only")
-                return Promise(value: true)
+                return .value(true)
             }
         }.then { (results: Bool) -> Promise<Void> in
             log.info("OK uploading \(numFiles). \(results)");

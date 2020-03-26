@@ -61,8 +61,10 @@ class EncryptedStorage {
         guard let aesKey = aesKey, let iv = iv else {
             return Promise(error: DataStorageErrors.notInitialized)
         }
-        return Promise().then(on: queue) {
+        return Promise().then(on: queue) {_ -> Promise<Void> in
+            // closure 1
             if (!self.fileManager.createFile(atPath: self.filename.path, contents: nil, attributes: [FileAttributeKey(rawValue: FileAttributeKey.protectionKey.rawValue): FileProtectionType.none])) {
+                // return closure 1
                 return Promise(error: DataStorageErrors.cantCreateFile)
             } else {
                 log.info("Create new enc file: \(self.filename)");
@@ -77,6 +79,7 @@ class EncryptedStorage {
             self.handle?.write(rsaLine!.data(using: String.Encoding.utf8)!)
             let ivHeader = Crypto.sharedInstance.base64ToBase64URL(iv.base64EncodedString()) + ":"
             self.handle?.write(ivHeader.data(using: String.Encoding.utf8)!)
+            // return closure
             return Promise()
         }
 
@@ -84,7 +87,7 @@ class EncryptedStorage {
     }
 
     func close() -> Promise<Void> {
-        return write(nil, writeLen: 0, isFlush: true).then(on: queue) {
+        return write(nil, writeLen: 0, isFlush: true).then(on: queue) { _ -> Promise<Void> in
             if let handle = self.handle {
                 handle.closeFile()
                 self.handle = nil
@@ -97,15 +100,15 @@ class EncryptedStorage {
 
     func _write(_ data: NSData, len: Int) -> Promise<Int> {
         if (len == 0) {
-            return Promise(value: 0);
+            return .value(0)
         }
-        return Promise().then(on: queue) {
+        return Promise().then(on: queue) { _ -> Promise<Int> in
             self.hasData = true
             let dataToWriteBuffer = UnsafeMutableRawPointer(mutating: data.bytes)
             let dataToWrite = NSData(bytesNoCopy: dataToWriteBuffer, length: len, freeWhenDone: false)
             let encodedData: String = Crypto.sharedInstance.base64ToBase64URL(dataToWrite.base64EncodedString(options: []))
             self.handle?.write(encodedData.data(using: String.Encoding.utf8)!)
-            return Promise(value: len)
+            return .value(len)
         }
 
     }
@@ -147,7 +150,7 @@ class EncryptedStorage {
                 evenLength = (self.currentData.length / 3) * 3
             }
             return self._write(self.currentData, len: evenLength)
-            }.then(on: queue) { evenLength in
+            }.done(on: queue) { evenLength in
                 self.currentData.replaceBytes(in: NSRange(0..<evenLength), withBytes: nil, length: 0)
         }
     }
@@ -295,7 +298,7 @@ class DataStorage {
     }
 
     func store(_ data: [String]) -> Promise<Void> {
-        return Promise().then(on: queue) {
+        return Promise().then(on: queue) { _ -> Promise<Void> in
             var sanitizedData: [String];
             if (self.sanitize) {
                 sanitizedData = [];
@@ -312,7 +315,7 @@ class DataStorage {
     }
 
     func flush(_ reset: Bool = false) -> Promise<Void> {
-        return Promise().then(on: queue) {
+        return Promise().then(on: queue) { _ -> Promise<Void> in
             self.logClosures = [ ];
             if (!self.hasData || self.lines.count == 0) {
                 if (reset) {
@@ -536,7 +539,7 @@ class DataStorageManager {
                 }
                 /* Need to flush again, because there is (very slim) one of those files was created after the flush */
                 return self._flushAll()
-            }.then(on: prepQ) { 
+            }.then(on: prepQ) { _ -> Promise<Void> in
                 for filename in filesToUpload {
                     let src = DataStorageManager.currentDataDirectory().appendingPathComponent(filename);
                     let dst = DataStorageManager.uploadDataDirectory().appendingPathComponent(filename);

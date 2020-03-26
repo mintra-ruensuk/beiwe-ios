@@ -95,16 +95,16 @@ class ApiManager {
         //parameters.removeValueForKey("device_id");
         //parameters.removeValueForKey("patient_id");
         let headers = generateHeaders(password);
-        return Promise { resolve, reject in
+        return Promise { seal in
             Alamofire.request(baseApiUrl + T.apiEndpoint, method: .post, parameters: parameters, headers: headers)
                 .responseString { response in
                     switch response.result {
                     case .failure(let error):
-                        reject(error);
+                        return seal.reject(error);
                     case .success:
                         let statusCode = response.response?.statusCode;
-                        if let statusCode = statusCode, statusCode < 200 || statusCode >= 400 {
-                            reject(ApiErrors.failedStatus(code: statusCode));
+                        if let statusCode = statusCode, (statusCode < 200 || statusCode >= 400) {
+                            return seal.reject(ApiErrors.failedStatus(code: statusCode));
                         } else {
                             var returnObject: T.ApiReturnType?;
                             if (T.ApiReturnType.self == BodyResponse.self) {
@@ -113,9 +113,9 @@ class ApiManager {
                                 returnObject = Mapper<T.ApiReturnType>().map(JSONString: response.result.value ?? "");
                             }
                             if let returnObject = returnObject {
-                                resolve((returnObject, statusCode ?? 0));
+                                return seal.fulfill((returnObject, statusCode ?? 0));
                             } else {
-                                reject(ApiManager.serialErr());
+                                return seal.reject(ApiManager.serialErr());
                             }
                         }
                     }
@@ -134,23 +134,23 @@ class ApiManager {
         //parameters.removeValueForKey("device_id");
         //parameters.removeValueForKey("patient_id");
         let headers = generateHeaders();
-        return Promise { resolve, reject in
+        return Promise { seal in
             Alamofire.request(baseApiUrl + T.apiEndpoint, method: .post,parameters: parameters, headers: headers)
                 .responseString { response in
                     switch response.result {
                     case .failure(let error):
-                        reject(error);
+                        seal.reject(error);
                     case .success:
                         let statusCode = response.response?.statusCode;
                         if let statusCode = statusCode, statusCode < 200 || statusCode >= 400 {
-                            reject(ApiErrors.failedStatus(code: statusCode));
+                            seal.reject(ApiErrors.failedStatus(code: statusCode));
                         } else {
                             var returnObject: [T.ApiReturnType]?;
                             returnObject = Mapper<T.ApiReturnType>().mapArray(JSONString: response.result.value ?? "");
                             if let returnObject = returnObject {
-                                resolve((returnObject, statusCode ?? 0));
+                                seal.fulfill((returnObject, statusCode ?? 0));
                             } else {
-                                reject(ApiManager.serialErr());
+                                seal.reject(ApiManager.serialErr());
                             }
                         }
                     }
@@ -229,7 +229,7 @@ class ApiManager {
         (request, _) = encoding.encode(request, parameters: parameters)
         */
         let url = baseApiUrl + T.apiEndpoint;
-        return Promise { resolve, reject in
+        return Promise { seal in
             Alamofire.upload(multipartFormData: { multipartFormData in
                 for (k, v) in parameters {
                     multipartFormData.append (String(describing: v).data(using: .utf8)!, withName: k)
@@ -246,11 +246,11 @@ class ApiManager {
                         upload.responseString { response in
                             switch response.result {
                             case .failure(let error):
-                                reject(error);
+                                seal.reject(error);
                             case .success:
                                 let statusCode = response.response?.statusCode;
                                 if let statusCode = statusCode, statusCode < 200 || statusCode >= 400 {
-                                    reject(ApiErrors.failedStatus(code: statusCode));
+                                    seal.reject(ApiErrors.failedStatus(code: statusCode));
                                 } else {
                                     var returnObject: T.ApiReturnType?;
                                     if (T.ApiReturnType.self == BodyResponse.self) {
@@ -259,9 +259,9 @@ class ApiManager {
                                         returnObject = Mapper<T.ApiReturnType>().map(JSONString: response.result.value ?? "");
                                     }
                                     if let returnObject = returnObject {
-                                        resolve((returnObject, statusCode ?? 0));
+                                        seal.fulfill((returnObject, statusCode ?? 0));
                                     } else {
-                                        reject(ApiManager.serialErr());
+                                        seal.reject(ApiManager.serialErr());
                                     }
                                 }
                             }
@@ -269,7 +269,7 @@ class ApiManager {
                         }
 
                     case .failure(let encodingError):
-                        reject(encodingError);
+                        seal.reject(encodingError);
                     }
             });
         }

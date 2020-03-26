@@ -31,7 +31,7 @@ class ChangePasswordViewController: FormViewController {
         // Do any additional setup after loading the view.
 
         form +++ Section(){ section in
-            if (isForgotPassword) {
+            if (self.isForgotPassword) {
                 var header = HeaderFooterView<ForgotPasswordHeaderView>(.nibFile(name: "ForgotPasswordHeaderView", bundle: nil))
                 header.onSetupView = { headerView, _ in
                     headerView.patientId.text = StudyManager.sharedInstance.currentStudy?.patientId ?? ""
@@ -80,8 +80,10 @@ class ChangePasswordViewController: FormViewController {
                         let currentPassword: String? = formValues["currentPassword"] as! String?;
                         if let newPassword = newPassword, let currentPassword = currentPassword {
                             let changePasswordRequest = ChangePasswordRequest(newPassword: newPassword);
-                            ApiManager.sharedInstance.makePostRequest(changePasswordRequest, password: currentPassword).then {
-                                (body, code) -> Void in
+                            ApiManager.sharedInstance.makePostRequest(changePasswordRequest, password: currentPassword).done {
+                                (arg) in
+                                
+                                let (body, code) = arg
                                 log.info("Password changed");
                                 PersistentPasswordManager.sharedInstance.storePassword(newPassword);
                                 HUD.flash(.success, delay: 1);

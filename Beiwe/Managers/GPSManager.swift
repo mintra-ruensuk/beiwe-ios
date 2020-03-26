@@ -86,13 +86,16 @@ class GPSManager : NSObject, CLLocationManagerDelegate, DataServiceProtocol {
         clearPollTimer();
         var promise = Promise();
         for dataStatus in dataCollectionServices {
-            promise = promise.then(on: DispatchQueue.global(qos: .default)) {
+            // use .done because not returning anything
+            promise = promise.done(on: DispatchQueue.global(qos: .default)) {_ in
                 dataStatus.handler.finishCollecting().then(on: DispatchQueue.global(qos: .default)) {
+                    // need to explicitly state return type
+                    _ -> Promise<Void> in
                     print("Returned from finishCollecting")
                     return Promise()
 
-                    }.catch(on: DispatchQueue.global(qos: .default)) {_ in
-                        print("err from finish collecting")
+                }.catch(on: DispatchQueue.global(qos: .default)) {
+                        _ in print("err from finish collecting")
                 }
             }
         }

@@ -136,7 +136,7 @@ class RegisterViewController: FormViewController {
                             }.then { _ -> Promise<Bool> in
                                 HUD.flash(.success, delay: 1);
                                 return StudyManager.sharedInstance.loadDefaultStudy();
-                            }.then { _ -> Void in
+                            }.done { _ -> Void in
                                 AppDelegate.sharedInstance().isLoggedIn = true;
                                 if let dismiss = self.dismiss {
                                     dismiss(true);
