@@ -51,19 +51,19 @@ class ChangePasswordViewController: FormViewController {
                 $0.title = isForgotPassword ? NSLocalizedString("forgot_password_temporary_password_caption", comment: "") : NSLocalizedString("reset_password_current_password_caption", comment: "")
                 let placeholder: String = String($0.title!.lowercased().characters.dropLast())
                 $0.placeholder = placeholder
-                $0.rules = [RequiredRule()]
+                $0.customRules = [RequiredRule()]
                 $0.autoValidation = autoValidation
             }
             <<< SVPasswordRow("password") {
                 $0.title = NSLocalizedString("reset_password_new_password_caption", comment: "")
                 $0.placeholder = NSLocalizedString("reset_password_new_password_hint", comment: "")
-                $0.rules = [RequiredRule(), RegexRule(regex: Constants.passwordRequirementRegex, message: Constants.passwordRequirementDescription)]
+                $0.customRules = [RequiredRule(), RegexRule(regex: Constants.passwordRequirementRegex, message: Constants.passwordRequirementDescription)]
                 $0.autoValidation = autoValidation
             }
             <<< SVPasswordRow("confirmPassword") {
                 $0.title = NSLocalizedString("reset_password_confirm_new_password_caption", comment: "")
                 $0.placeholder = NSLocalizedString("reset_password_confirm_new_password_hint", comment: "")
-                $0.rules = [RequiredRule(), MinLengthRule(length: 1)]
+                $0.customRules = [RequiredRule(), MinLengthRule(length: 1)]
                 $0.autoValidation = autoValidation
             }
             <<< ButtonRow() {
@@ -125,7 +125,7 @@ class ChangePasswordViewController: FormViewController {
         }
         let passwordRow: SVPasswordRow? = form.rowBy(tag: "password");
         let confirmRow: SVPasswordRow? = form.rowBy(tag: "confirmPassword");
-        confirmRow!.rules = [ConfirmationRule(confirmField: passwordRow!.cell.textField)]
+        confirmRow!.customRules = [ConfirmationRule(confirmField: passwordRow!.cell.textField)]
 
 
 

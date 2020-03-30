@@ -48,45 +48,45 @@ class RegisterViewController: FormViewController {
             section = section <<< SVURLRow("server") {
                 $0.title = NSLocalizedString("registration_server_url_label", comment: "")
                 $0.placeholder = NSLocalizedString("registration_server_url_hint", comment: "")
-                $0.rules = [RequiredRule()]
+                $0.customRules = [RequiredRule()]
                 $0.autoValidation = autoValidation
             }
         }
         section = section <<< SVAccountRow("patientId") {
                 $0.title = NSLocalizedString("registration_user_id_label", comment: "")
                 $0.placeholder = NSLocalizedString("registration_user_id_hint", comment: "")
-                $0.rules = [RequiredRule()]
+                $0.customRules = [RequiredRule()]
                 $0.autoValidation = autoValidation
             }
             <<< SVPasswordRow("tempPassword") {
                 $0.title = NSLocalizedString("registration_temp_password_label", comment: "")
                 $0.placeholder = NSLocalizedString("registration_temp_password_hint", comment: "")
-                $0.rules = [RequiredRule()]
+                $0.customRules = [RequiredRule()]
                 $0.autoValidation = autoValidation
             }
             <<< SVPasswordRow("password") {
                 $0.title = NSLocalizedString("registration_new_password_label", comment: "")
                 $0.placeholder = NSLocalizedString("registration_new_password_hint", comment: "")
-                $0.rules = [RequiredRule(), RegexRule(regex: Constants.passwordRequirementRegex, message: Constants.passwordRequirementDescription)]
+                $0.customRules = [RequiredRule(), RegexRule(regex: Constants.passwordRequirementRegex, message: Constants.passwordRequirementDescription)]
                 $0.autoValidation = autoValidation
             }
             <<< SVPasswordRow("confirmPassword") {
                 $0.title = NSLocalizedString("registration_confirm_new_password_label", comment: "")
                 $0.placeholder = NSLocalizedString("registration_confirm_new_password_hint", comment: "")
-                $0.rules = [RequiredRule(), MinLengthRule(length: 1)]
+                $0.customRules = [RequiredRule(), MinLengthRule(length: 1)]
                 $0.autoValidation = autoValidation
             }
             <<< SVSimplePhoneRow("clinicianPhone") {
                 $0.title = NSLocalizedString("phone_number_entry_your_clinician_label", comment: "")
                 $0.placeholder = NSLocalizedString("phone_number_entry_your_clinician_hint", comment: "")
-                $0.rules = [RequiredRule(), PhoneNumberRule()]
+                $0.customRules = [RequiredRule(), PhoneNumberRule()]
                 $0.autoValidation = autoValidation
 
             }
             <<< SVSimplePhoneRow("raPhone") {
                 $0.title = NSLocalizedString("phone_number_entry_research_assistant_label", comment: "")
                 $0.placeholder = NSLocalizedString("phone_number_entry_research_assistant_hint", comment: "")
-                $0.rules = [RequiredRule(), PhoneNumberRule()]
+                $0.customRules = [RequiredRule(), PhoneNumberRule()]
                 $0.autoValidation = autoValidation
 
             }
@@ -187,7 +187,7 @@ class RegisterViewController: FormViewController {
 
         let passwordRow: SVPasswordRow? = form.rowBy(tag: "password");
         let confirmRow: SVPasswordRow? = form.rowBy(tag: "confirmPassword");
-        confirmRow!.rules = [ConfirmationRule(confirmField: passwordRow!.cell.textField)]
+        confirmRow!.customRules = [ConfirmationRule(confirmField: passwordRow!.cell.textField)]
 
 
 

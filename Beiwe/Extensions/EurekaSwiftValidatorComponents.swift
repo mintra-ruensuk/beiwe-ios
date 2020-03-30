@@ -154,7 +154,7 @@ open class _SVFieldCell<T>: _FieldCell<T> where T: Equatable, T: InputTypeInitia
 public protocol SVRow {
     var errorColor: UIColor { get set }
 
-    var rules: [Rule]? { get set }
+    var customRules: [Rule]? { get set }
 
     var autoValidation: Bool { get set }
 
@@ -177,7 +177,7 @@ open class _SVTextRow<Cell: _SVFieldCell<String>>: FieldRow<Cell>, SVRow where C
         }
     }
 
-    open var rules: [Rule]? {
+    open var customRules: [Rule]? {
         get {
             return self.cell.rules
         }
