@@ -114,7 +114,7 @@ class EncryptedStorage {
     }
 
     func write(_ data: NSData?, writeLen: Int, isFlush: Bool = false) -> Promise<Void> {
-        return Promise().then(on: queue) {
+        return Promise().then(on: queue) { _ -> Promise<Int> in
             if (data != nil && writeLen != 0) {
                 // Need to encrypt data
                 let encryptLen = self.sc.getOutputLength(inputByteCount: writeLen)
@@ -522,7 +522,7 @@ class DataStorageManager {
         let prepQ = DispatchQueue.global(priority: DispatchQueue.GlobalQueuePriority.default)
         var filesToUpload: [String] = [ ]
         /* Flush once to get all of the files currently processing */
-        return self._flushAll().then(on: prepQ) {
+        return self._flushAll().then(on: prepQ) { _ -> Promise<Void> in
             /* And record there names */
             let fileManager = FileManager.default
 

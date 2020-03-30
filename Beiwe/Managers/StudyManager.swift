@@ -32,7 +32,7 @@ class StudyManager {
     func loadDefaultStudy() -> Promise<Bool> {
         currentStudy = nil;
         gpsManager = nil;
-        return firstly { 
+        return firstly { () -> Promise<[Study]> in
             return Recline.shared.queryAll()
             }.then { (studies: [Study]) -> Promise<Bool> in
             if (studies.count > 1) {
@@ -43,7 +43,7 @@ class StudyManager {
                 self.currentStudy = studies[0];
                 AppDelegate.sharedInstance().setDebuggingUser(self.currentStudy?.patientId ?? "unknown")
             }
-            return Promise(value: true);
+                return .value(true)
         }
 
     }
@@ -151,10 +151,10 @@ class StudyManager {
     }
 
     func purgeStudies() -> Promise<Bool> {
-        return firstly {
+        return firstly { () -> Promise<[Study]> in
             return Recline.shared.queryAll()
             }.then { (studies: [Study]) -> Promise<Bool> in
-                var promise = Promise<Bool>(value: true)
+                var promise = Promise<Bool>.value(true)
                 for study in studies {
                     promise = promise.then { _ in
                         return Recline.shared.purge(study)
@@ -525,13 +525,13 @@ class StudyManager {
         return Recline.shared.save(study).then { _ -> Promise<([Survey], Int)> in
                 let surveyRequest = GetSurveysRequest();
                 return ApiManager.sharedInstance.arrayPostRequest(surveyRequest);
-            }.then { (surveys, _) in
+            }.then { (surveys, _) -> Promise<Void> in
                 log.info("Surveys: \(surveys)");
                 study.surveys = surveys;
                 return Recline.shared.save(study).asVoid();
-            }.then {
+            }.then { _ -> Promise<Bool> in
                 self.updateActiveSurveys();
-                return Promise(value: true);
+                return .value(true)
             }.recover { _ -> Promise<Bool> in
                 return .value(false);
         }
@@ -675,7 +675,7 @@ class StudyManager {
                 for (filename, len) in filesToProcess {
                     let filePath = DataStorageManager.uploadDataDirectory().appendingPathComponent(filename);
                     let uploadRequest = UploadRequest(fileName: filename, filePath: filePath.path);
-                    uploadChain = uploadChain.then {_ in
+                    uploadChain = uploadChain.then {_ -> Promise<Bool> in
                         log.info("Uploading: \(filename)")
                         return ApiManager.sharedInstance.makeMultipartUploadRequest(uploadRequest, file: filePath).then { _ -> Promise<Bool> in
                             log.info("Finished uploading: \(filename), removing.");
@@ -684,7 +684,7 @@ class StudyManager {
                             try fileManager.removeItem(at: filePath);
                             storageInUse = storageInUse - len
                             filesToProcess.removeValue(forKey: filename)
-                            return Promise(value: true);
+                            return .value(true)
                         }
                     }.recover { error -> Promise<Bool> in
                         AppEventManager.sharedInstance.logAppEvent(event: "upload_file_failed", msg: "Failed Uploaded data file", d1: filename)
