@@ -393,6 +393,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
       // With swizzling disabled you must set the APNs token here.
        Messaging.messaging().apnsToken = deviceToken
     }
+    
+    func sendFCMToken(fcmToken: String) {
+        let fcmTokenRequest = FCMTokenRequest(fcmToken: fcmToken)
+        ApiManager.sharedInstance.makePostRequest(fcmTokenRequest).catch {
+            (error) in
+            print("Error registering FCM token: \(error)")
+        }
+    }
 
 }
 
@@ -444,12 +452,19 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
 extension AppDelegate : MessagingDelegate {
   // [START refresh_token]
   func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String) {
-    print("Firebase registration token: \(fcmToken)")
+    print("Tuck: Firebase registration token: \(fcmToken)")
     
     let dataDict:[String: String] = ["token": fcmToken]
     NotificationCenter.default.post(name: Notification.Name("FCMToken"), object: nil, userInfo: dataDict)
-    // TODO: If necessary send token to application server.
     // Note: This callback is fired at each app startup and whenever a new token is generated.
+    
+    // TODO: thread this sleep statement
+    // wait until user is registered to send FCM token
+//    while ApiManager.sharedInstance.patientId == "" {
+//        sleep(1)
+//        print("sleep")
+//    }
+    sendFCMToken(fcmToken: fcmToken)
   }
   // [END refresh_token]
   // [START ios_10_data_message]

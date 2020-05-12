@@ -128,13 +128,7 @@ class RegisterViewController: FormViewController {
                             
                             // [START log_fcm_reg_token]
                             let token = Messaging.messaging().fcmToken
-                            ApiManager.sharedInstance.fcmToken = token
-                            let fcmTokenRequest = FCMTokenRequest(fcmToken: token ?? "")
-                            ApiManager.sharedInstance.makePostRequest(fcmTokenRequest).catch {
-                                (error) in
-                                print("Error registering FCM token: \(error)")
-                            }
-                            print("FCM token: \(token ?? "")")
+                            AppDelegate.sharedInstance().sendFCMToken(fcmToken: token ?? "")
                             // [END log_fcm_reg_token]
 
                             // [START log_iid_reg_token]
@@ -142,7 +136,7 @@ class RegisterViewController: FormViewController {
                               if let error = error {
                                 print("Error fetching remote instance ID: \(error)")
                               } else if let result = result {
-                                print("Remote instance ID token: \(result.token)")                                
+                                print("Remote instance ID token: \(result.token)")
                               }
                             }
                             // [END log_iid_reg_token]
