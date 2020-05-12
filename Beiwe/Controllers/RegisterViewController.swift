@@ -15,9 +15,6 @@ import Sentry
 import Firebase
 
 class RegisterViewController: FormViewController {
-    
-    @IBOutlet weak var fcmTokenMessage: UILabel!
-    @IBOutlet weak var instanceIDTokenMessage: UILabel!
 
     static let commErrDelay = 7.0
     static let commErr = NSLocalizedString("http_message_server_not_found", comment: "")
@@ -125,45 +122,32 @@ class RegisterViewController: FormViewController {
                             
                             // sets tags for Sentry
                             Client.shared?.tags = ["user_id": patientId, "server_url": customApiUrl ?? "Not Registered"]
+                            ApiManager.sharedInstance.password = tempPassword ?? "";
+                            ApiManager.sharedInstance.patientId = patientId;
+                            ApiManager.sharedInstance.customApiUrl = customApiUrl;
                             
                             // [START log_fcm_reg_token]
                             let token = Messaging.messaging().fcmToken
                             ApiManager.sharedInstance.fcmToken = token
-                            let fcmTokenRequest = FCMTokenRequest(fcmToken: token)
+                            let fcmTokenRequest = FCMTokenRequest(fcmToken: token ?? "")
                             ApiManager.sharedInstance.makePostRequest(fcmTokenRequest).catch {
                                 (error) in
-                                print("Error reistering FCM token")
-                                
-                                
+                                print("Error registering FCM token: \(error)")
                             }
                             print("FCM token: \(token ?? "")")
                             // [END log_fcm_reg_token]
-                            if self.fcmTokenMessage != nil {
-                                print("Tuck: fcmtoken.text is \(self.fcmTokenMessage.text)")
-                                self.fcmTokenMessage.text  = "Logged FCM token: \(token ?? "")"
-                            } else {
-                                print("Tuck: fcmTokenMessage is nil")
-                            }
 
                             // [START log_iid_reg_token]
                             InstanceID.instanceID().instanceID { (result, error) in
                               if let error = error {
                                 print("Error fetching remote instance ID: \(error)")
                               } else if let result = result {
-                                print("Remote instance ID token: \(result.token)")
-                                if self.instanceIDTokenMessage != nil {
-                                    self.instanceIDTokenMessage.text  = "Remote InstanceID token: \(result.token)"
-                                } else {
-                                    print("Tuck: instanceIDTokenMessage is nil")
-                                }
-                                
+                                print("Remote instance ID token: \(result.token)")                                
                               }
                             }
                             // [END log_iid_reg_token]
                             
-                            ApiManager.sharedInstance.password = tempPassword ?? "";
-                            ApiManager.sharedInstance.patientId = patientId;
-                            ApiManager.sharedInstance.customApiUrl = customApiUrl;
+                            
                             ApiManager.sharedInstance.makePostRequest(registerStudyRequest).then {
                                 (studySettings, _) -> Promise<Study> in
                                 PersistentPasswordManager.sharedInstance.storePassword(newPassword);
