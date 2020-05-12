@@ -19,6 +19,8 @@ target 'Beiwe' do
   pod 'XLActionController', '~>5.0.1'
   pod 'XCGLogger', '~> 7.0.0'
   pod 'Sentry', :git => 'https://github.com/getsentry/sentry-cocoa.git', :tag => '4.5.0'
+  pod 'Firebase/Analytics'
+  pod 'Firebase/Messaging'
 
 end
 

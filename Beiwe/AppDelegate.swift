@@ -13,10 +13,11 @@ import Crashlytics
 import PromiseKit
 import CoreMotion;
 import ReachabilitySwift
-import ResearchKit;
+import ResearchKit
 import XCGLogger
 import EmitterKit
 import Foundation
+import Firebase
 
 let log = XCGLogger(identifier: "advancedLogger", includeDefaultDestinations: false)
 
@@ -34,6 +35,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
     var canOpenTel = false;
     let debugEnabled  = _isDebugAssertConfiguration();
     let lockEvent = EmitterKit.Event<Bool>();
+    let gcmMessageIDKey = "gcm.message_id"
     
     var locationPermission: Bool = false;
     // manager needed to ask for location permissions
@@ -166,7 +168,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
         } catch let error {
             print("\(error)")
         }
-
+        
+        // initialize Firebase
+        FirebaseApp.configure()
+        UNUserNotificationCenter.current().delegate = self
+        Messaging.messaging().delegate = self
+        application.registerForRemoteNotifications()
 
         return true
     }
@@ -380,11 +387,78 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
         }
     }
 
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+      print("APNs token retrieved: \(deviceToken)")
 
+      // With swizzling disabled you must set the APNs token here.
+       Messaging.messaging().apnsToken = deviceToken
+    }
 
 }
 
 extension String: LocalizedError {
     public var errorDescription: String? { return self }
 }
+
+// [START ios_10_message_handling]
+@available(iOS 10, *)
+extension AppDelegate : UNUserNotificationCenterDelegate {
+
+  // Receive displayed notifications for iOS 10 devices.
+  func userNotificationCenter(_ center: UNUserNotificationCenter,
+                              willPresent notification: UNNotification,
+    withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+    let userInfo = notification.request.content.userInfo
+
+    // With swizzling disabled you must let Messaging know about the message, for Analytics
+    // Messaging.messaging().appDidReceiveMessage(userInfo)
+    // Print message ID.
+    if let messageID = userInfo[gcmMessageIDKey] {
+      print("Message ID: \(messageID)")
+    }
+
+    // Print full message.
+    print(userInfo)
+
+    // Change this to your preferred presentation option
+    completionHandler([])
+  }
+
+  func userNotificationCenter(_ center: UNUserNotificationCenter,
+                              didReceive response: UNNotificationResponse,
+                              withCompletionHandler completionHandler: @escaping () -> Void) {
+    let userInfo = response.notification.request.content.userInfo
+    // Print message ID.
+    if let messageID = userInfo[gcmMessageIDKey] {
+      print("Message ID: \(messageID)")
+    }
+
+    // Print full message.
+    print(userInfo)
+
+    completionHandler()
+  }
+}
+// [END ios_10_message_handling]
+
+extension AppDelegate : MessagingDelegate {
+  // [START refresh_token]
+  func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String) {
+    print("Firebase registration token: \(fcmToken)")
+    
+    let dataDict:[String: String] = ["token": fcmToken]
+    NotificationCenter.default.post(name: Notification.Name("FCMToken"), object: nil, userInfo: dataDict)
+    // TODO: If necessary send token to application server.
+    // Note: This callback is fired at each app startup and whenever a new token is generated.
+  }
+  // [END refresh_token]
+  // [START ios_10_data_message]
+  // Receive data messages on iOS 10+ directly from FCM (bypassing APNs) when the app is in the foreground.
+  // To enable direct data messages, you can set Messaging.messaging().shouldEstablishDirectChannel to true.
+  func messaging(_ messaging: Messaging, didReceive remoteMessage: MessagingRemoteMessage) {
+    print("Received data message: \(remoteMessage.appData)")
+  }
+  // [END ios_10_data_message]
+}
+
 

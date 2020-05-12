@@ -56,6 +56,7 @@ class ApiManager {
         }
     }
 
+    var fcmToken: String?;
     var patientId: String = "";
     var customApiUrl: String?;
     var baseApiUrl: String {
