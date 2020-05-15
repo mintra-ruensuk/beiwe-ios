@@ -393,6 +393,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
       // With swizzling disabled you must set the APNs token here.
        Messaging.messaging().apnsToken = deviceToken
     }
+
+    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        print("Failed to register for notifications: \(error.localizedDescription)")
+    }
     
     func sendFCMToken(fcmToken: String) {
         let fcmTokenRequest = FCMTokenRequest(fcmToken: fcmToken)

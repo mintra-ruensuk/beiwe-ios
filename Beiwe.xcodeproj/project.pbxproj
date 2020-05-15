@@ -88,6 +88,10 @@
 		324885392465DD70002F0F81 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		3248853B2469ADC2002F0F81 /* FCMTokenRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCMTokenRequest.swift; sourceTree = "<group>"; };
 		32756626245876CC00299A04 /* Private.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Private.swift; sourceTree = "<group>"; };
+		32D25F81246EE23E005286EB /* Beiwe2Debug2.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Beiwe2Debug2.entitlements; sourceTree = "<group>"; };
+		32D25F82246EE28F005286EB /* Beiwe2Release2.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Beiwe2Release2.entitlements; sourceTree = "<group>"; };
+		32D25F83246EE294005286EB /* Beiwe2Release.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Beiwe2Release.entitlements; sourceTree = "<group>"; };
+		32D25F84246EE297005286EB /* Beiwe2Debug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Beiwe2Debug.entitlements; sourceTree = "<group>"; };
 		42A952CE64A464FDCA28DEBD /* Pods-Beiwe.release2.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Beiwe.release2.xcconfig"; path = "Target Support Files/Pods-Beiwe/Pods-Beiwe.release2.xcconfig"; sourceTree = "<group>"; };
 		4D73594BB9D98FBE3AA1E023 /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		59912EB2230EF09400CAF7EB /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Beiwe/Base.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -386,6 +390,10 @@
 		83F98C381C923C3600E0B64B /* Beiwe */ = {
 			isa = PBXGroup;
 			children = (
+				32D25F84246EE297005286EB /* Beiwe2Debug.entitlements */,
+				32D25F83246EE294005286EB /* Beiwe2Release.entitlements */,
+				32D25F82246EE28F005286EB /* Beiwe2Release2.entitlements */,
+				32D25F81246EE23E005286EB /* Beiwe2Debug2.entitlements */,
 				324885392465DD70002F0F81 /* GoogleService-Info.plist */,
 				83AF04111CAA083400A37225 /* Beiwe-Bridging-Header.h */,
 				327566282458801B00299A04 /* Private */,
@@ -810,6 +818,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				BUNDLE_ID_SUFFIX = debug;
+				CODE_SIGN_ENTITLEMENTS = Beiwe/Beiwe2Debug2.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
@@ -896,6 +905,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				BUNDLE_ID_SUFFIX = "";
+				CODE_SIGN_ENTITLEMENTS = Beiwe/Beiwe2Release2.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -1043,6 +1053,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				BUNDLE_ID_SUFFIX = debug;
+				CODE_SIGN_ENTITLEMENTS = Beiwe/Beiwe2Debug.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
@@ -1071,6 +1082,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				BUNDLE_ID_SUFFIX = "";
+				CODE_SIGN_ENTITLEMENTS = Beiwe/Beiwe2Release.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -1103,7 +1115,7 @@
 				3275662B245B238B00299A04 /* Release2 */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug2;
 		};
 		83F98C481C923C3600E0B64B /* Build configuration list for PBXNativeTarget "Beiwe" */ = {
 			isa = XCConfigurationList;
@@ -1114,7 +1126,7 @@
 				3275662C245B238B00299A04 /* Release2 */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug2;
 		};
 /* End XCConfigurationList section */
 	};
