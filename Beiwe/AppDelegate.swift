@@ -23,7 +23,7 @@ let log = XCGLogger(identifier: "advancedLogger", includeDefaultDestinations: fa
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate {
-
+    
     var window: UIWindow?
     var storyboard: UIStoryboard?;
     var modelVersionId = "";
@@ -41,15 +41,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
     // manager needed to ask for location permissions
     let locManager: CLLocationManager = CLLocationManager()
     
-
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-
+        
         Fabric.with([Crashlytics.self])
-
+        
         // Create a destination for the system console log (via NSLog)
         let systemLogDestination = AppleSystemLogDestination(owner: log, identifier: "advancedLogger.systemLogDestination")
-
+        
         // Optionally set some configuration options
         systemLogDestination.outputLevel = debugEnabled ? .debug : .warning
         systemLogDestination.showLogIdentifier = false
@@ -62,7 +62,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
         
         // Add the destination to the logger
         log.add(destination: systemLogDestination)
-
+        
         let crashlyticsLogDestination = XCGCrashlyticsLogDestination(owner: log, identifier: "advancedlogger.crashlyticsDestination")
         crashlyticsLogDestination.outputLevel = .debug
         crashlyticsLogDestination.showLogIdentifier = false
@@ -72,16 +72,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
         crashlyticsLogDestination.showFileName = false // true
         crashlyticsLogDestination.showLineNumber = false // true
         crashlyticsLogDestination.showDate = true
-
+        
         // Add the destination to the logger
         log.add(destination: crashlyticsLogDestination)
-
-
+        
+        
         log.info("applicationDidFinishLaunching")
         log.logAppDetails()
-
+        
         AppEventManager.sharedInstance.didLaunch(launchOptions: launchOptions);
-
+        
         do {
             reachability = try Reachability()
             try reachability!.startNotifier()
@@ -96,62 +96,62 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
         log.info("systemVersion: \(uiDevice.systemVersion)");
         log.info("model: \(uiDevice.model)");
         log.info("platform: \(platform())");
-
+        
         canOpenTel = UIApplication.shared.canOpenURL(URL(string: "tel:6175551212")!);
-
-
+        
+        
         /* Colors */
-
+        
         //let rkAppearance = UIView.my_appearanceWhenContained(in: ORKTaskViewController.self)
         let rkAppearance = UIView.appearance(whenContainedInInstancesOf: [ORKTaskViewController.self])
         rkAppearance.tintColor = AppColors.tintColor;
         //rkAppearance.backgroundColor = UIColor.clearColor() // AppColors.gradientBottom;
-
+        
         /*
-        let stepAppearance = UIView.my_appearanceWhenContainedIn(ORKStepViewController.self)
-        stepAppearance.tintColor = AppColors.tintColor;
-        stepAppearance.backgroundColor = UIColor.clearColor() // AppColors.gradientBottom;
-        */
-
+         let stepAppearance = UIView.my_appearanceWhenContainedIn(ORKStepViewController.self)
+         stepAppearance.tintColor = AppColors.tintColor;
+         stepAppearance.backgroundColor = UIColor.clearColor() // AppColors.gradientBottom;
+         */
+        
         /*
-        UIView.appearanceWhenContainedInInstancesOfClasses([ORKTaskViewController.self]).tintColor = AppColors.tintColor
-        */
-
+         UIView.appearanceWhenContainedInInstancesOfClasses([ORKTaskViewController.self]).tintColor = AppColors.tintColor
+         */
+        
         //UIView.appearance().tintColor = AppColors.tintColor;
-
+        
         storyboard = UIStoryboard(name: "Main", bundle: Bundle.main);
-
+        
         self.window = UIWindow(frame: UIScreen.main.bounds);
         self.window?.rootViewController = UIStoryboard(name: "LaunchScreen", bundle: Bundle.main).instantiateViewController(withIdentifier: "launchScreen");
         /* Gradient background so we can use "clear" RK views */
         /*
-        let backView = GradientView(frame: UIScreen.mainScreen().bounds)
-        backView.topColor = AppColors.gradientBottom
-        backView.bottomColor = UIColor.whiteColor()
-        self.window?.insertSubview(backView, atIndex: 0)
-        */
+         let backView = GradientView(frame: UIScreen.mainScreen().bounds)
+         backView.topColor = AppColors.gradientBottom
+         backView.bottomColor = UIColor.whiteColor()
+         self.window?.insertSubview(backView, atIndex: 0)
+         */
         
-
+        
         self.window!.makeKeyAndVisible()
-
+        
         Recline.shared.open().then { _ -> Promise<Bool> in
             print("Database opened");
             return StudyManager.sharedInstance.loadDefaultStudy();
-            }.done { _ -> Void in
-                self.transitionToCurrentAppState();
-            }.catch { err -> Void in
-                print("Database open failed.");
+        }.done { _ -> Void in
+            self.transitionToCurrentAppState();
+        }.catch { err -> Void in
+            print("Database open failed.");
         }
         //launchScreen
         /*
-            //self.window!.backgroundColor = UIColor.whiteColor()
-
-            self.window?.rootViewController = OnboardViewController();
-
-
-
-        }
-        */
+         //self.window!.backgroundColor = UIColor.whiteColor()
+         
+         self.window?.rootViewController = OnboardViewController();
+         
+         
+         
+         }
+         */
         
         // initialize Sentry
         do {
@@ -174,39 +174,39 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
         UNUserNotificationCenter.current().delegate = self
         Messaging.messaging().delegate = self
         application.registerForRemoteNotifications()
-
+        
         return true
     }
-
+    
     func changeRootViewControllerWithIdentifier(_ identifier:String!) {
         if (identifier == currentRootView) {
             return;
         }
         let desiredViewController:UIViewController = (self.storyboard?.instantiateViewController(withIdentifier: identifier))!;
-
+        
         changeRootViewController(desiredViewController, identifier: identifier);
     }
-
+    
     func changeRootViewController(_ desiredViewController: UIViewController, identifier: String? = nil) {
         currentRootView = identifier;
-
+        
         let snapshot:UIView = (self.window?.snapshotView(afterScreenUpdates: true))!
         desiredViewController.view.addSubview(snapshot);
-
+        
         self.window?.rootViewController = desiredViewController;
-
+        
         UIView.animate(withDuration: 0.3, animations: {() in
             snapshot.layer.opacity = 0;
             snapshot.layer.transform = CATransform3DMakeScale(1.5, 1.5, 1.5);
-            }, completion: {
-                (value: Bool) in
-                snapshot.removeFromSuperview();
+        }, completion: {
+            (value: Bool) in
+            snapshot.removeFromSuperview();
         });
     }
-
+    
     func transitionToCurrentAppState() {
-
-
+        
+        
         if let currentStudy = StudyManager.sharedInstance.currentStudy {
             if (currentStudy.participantConsented) {
                 StudyManager.sharedInstance.startStudyDataServices();
@@ -222,35 +222,35 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
                 } else {
                     changeRootViewController(ConsentManager().consentViewController);
                 }
-
+                
             }
-
+            
         } else {
             // If there is no study loaded, then it's obvious.  We need the onboarding flow
             // from the beginning.
             changeRootViewController(OnboardingManager().onboardingViewController);
         }
     }
-
+    
     static func sharedInstance() -> AppDelegate{
         return UIApplication.shared.delegate as! AppDelegate
     }
-
+    
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
         log.info("applicationWillResignActive")
     }
-
+    
     func applicationDidEnterBackground(_ application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
         log.info("applicationDidEnterBackground")
         timeEnteredBackground = Date();
         AppEventManager.sharedInstance.logAppEvent(event: "background", msg: "Application entered background")
-
+        
     }
-
+    
     func checkPasswordAndLogin(_ password: String) -> Bool {
         if let storedPassword = PersistentPasswordManager.sharedInstance.passwordForStudy(), storedPassword.count > 0 {
             if (password == storedPassword) {
@@ -258,13 +258,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
                 isLoggedIn = true;
                 return true;
             }
-
+            
         }
-
+        
         return false;
-
+        
     }
-
+    
     func applicationWillEnterForeground(_ application: UIApplication) {
         log.info("applicationWillEnterForeground")
         // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
@@ -280,39 +280,39 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
             isLoggedIn = false;
         }
     }
-
+    
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
         log.info("applicationDidBecomeActive")
         AppEventManager.sharedInstance.logAppEvent(event: "foreground", msg: "Application entered foreground")
     }
-
+    
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
         log.info("applicationWillTerminate")
         AppEventManager.sharedInstance.logAppEvent(event: "terminate", msg: "Application terminating")
-
+        
         let dispatchGroup = DispatchGroup();
-
+        
         dispatchGroup.enter()
         StudyManager.sharedInstance.stop().done(on: DispatchQueue.global(qos: .default)) { _ in
             dispatchGroup.leave()
-            }.catch(on: DispatchQueue.global(qos: .default)) {_ in 
-                dispatchGroup.leave()
+        }.catch(on: DispatchQueue.global(qos: .default)) {_ in
+            dispatchGroup.leave()
         }
-
+        
         dispatchGroup.wait();
         log.info("applicationWillTerminate exiting")
     }
-
+    
     func applicationDidReceiveMemoryWarning(_ application: UIApplication) {
         log.info("applicationDidReceiveMemoryWarning")
         AppEventManager.sharedInstance.logAppEvent(event: "memory_warn", msg: "Application received memory warning")
     }
-
+    
     func displayCurrentMainView() {
         //
-
+        
         var view: String;
         if let _ = StudyManager.sharedInstance.currentStudy {
             view = "initialStudyView";
@@ -320,25 +320,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
             view = "registerView";
         }
         self.window = UIWindow(frame: UIScreen.main.bounds)
-
+        
         self.window?.rootViewController = storyboard!.instantiateViewController(withIdentifier: view) as UIViewController?;
-
+        
         self.window!.makeKeyAndVisible()
         
     }
-
+    
     func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         log.info("applicationWillFinishLaunchingWithOptions")
         return true;
-
+        
     }
-
+    
     func applicationProtectedDataDidBecomeAvailable(_ application: UIApplication) {
         log.info("applicationProtectedDataDidBecomeAvailable");
         lockEvent.emit(false);
         AppEventManager.sharedInstance.logAppEvent(event: "unlocked", msg: "Phone/keystore unlocked")
     }
-
+    
     func applicationProtectedDataWillBecomeUnavailable(_ application: UIApplication) {
         log.info("applicationProtectedDataWillBecomeUnavailable");
         lockEvent.emit(true);
@@ -346,7 +346,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
         
     }
     /* Crashlytics functions -- future */
-
+    
     func setDebuggingUser(_ username: String) {
         // TODO: Use the current user's information
         // You can call any combination of these three methods
@@ -354,7 +354,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
         Crashlytics.sharedInstance().setUserIdentifier(username);
         //Crashlytics.sharedInstance().setUserName("Test User")
     }
-
+    
     func crash() {
         Crashlytics.sharedInstance().crash()
     }
@@ -386,16 +386,46 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
             break
         }
     }
-
-    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-      print("APNs token retrieved: \(deviceToken)")
-
-      // With swizzling disabled you must set the APNs token here.
-       Messaging.messaging().apnsToken = deviceToken
-    }
-
+    
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
         print("Failed to register for notifications: \(error.localizedDescription)")
+    }
+    
+    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any]) {
+        // If you are receiving a notification message while your app is in the background,
+        // this callback will not be fired till the user taps on the notification launching the application.
+        // TODO: Handle data of notification
+        
+        print("Tuck: recieved notification 1")
+        // Print message ID.
+        if let messageID = userInfo[gcmMessageIDKey] {
+            print("Message ID: \(messageID)")
+        }
+        
+        // Print full message.
+        print(userInfo)
+    }
+    
+    // called when recieving notification while app is in foreground
+    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any],
+                     fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        // If you are receiving a notification message while your app is in the background,
+        // this callback will not be fired till the user taps on the notification launching the application.
+        // TODO: Handle data of notification
+        
+        print("Tuck: recieved notification 2")
+        // Print message ID.
+        if let messageID = userInfo[gcmMessageIDKey] {
+            print("Message ID: \(messageID)")
+        }
+        
+        // Print full message.
+        print(userInfo)
+        if let survey_id = userInfo["survey_id"] {
+            downloadSurvey(survey_id: survey_id as! String)
+        }
+        
+        completionHandler(UIBackgroundFetchResult.newData)
     }
     
     func sendFCMToken(fcmToken: String) {
@@ -405,7 +435,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
             print("Error registering FCM token: \(error)")
         }
     }
-
+    
+    func downloadSurvey(survey_id: String) {
+        let getSingleSurveyRequest = GetSingleSurveyRequest(surveyID: survey_id)
+        ApiManager.sharedInstance.makePostRequest(getSingleSurveyRequest).done {
+            (arg) in
+            let (body, status) = arg
+            print("Body: \(body), status: \(status)")
+        } .catch {
+            (error) in
+            print("Error downloading survey: \(error)")
+        }
+    }
+    
 }
 
 extension String: LocalizedError {
@@ -415,69 +457,71 @@ extension String: LocalizedError {
 // [START ios_10_message_handling]
 @available(iOS 10, *)
 extension AppDelegate : UNUserNotificationCenterDelegate {
-
-  // Receive displayed notifications for iOS 10 devices.
-  func userNotificationCenter(_ center: UNUserNotificationCenter,
-                              willPresent notification: UNNotification,
-    withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-    let userInfo = notification.request.content.userInfo
-
-    // With swizzling disabled you must let Messaging know about the message, for Analytics
-    // Messaging.messaging().appDidReceiveMessage(userInfo)
-    // Print message ID.
-    if let messageID = userInfo[gcmMessageIDKey] {
-      print("Message ID: \(messageID)")
+    
+    // Receive displayed notifications for iOS 10 devices.
+    // Is called when recieving a notifcation while app is in foreground
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                willPresent notification: UNNotification,
+                                withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        let userInfo = notification.request.content.userInfo
+        print("Tuck: recieved notificaiton 3: \(notification.request.content)")
+        
+        // Print message ID.
+        if let messageID = userInfo[gcmMessageIDKey] {
+            print("Message ID: \(messageID)")
+        }
+        
+        // Print full message.
+        print(userInfo)
+        
+        // Change this to your preferred presentation option
+        completionHandler([])
     }
-
-    // Print full message.
-    print(userInfo)
-
-    // Change this to your preferred presentation option
-    completionHandler([])
-  }
-
-  func userNotificationCenter(_ center: UNUserNotificationCenter,
-                              didReceive response: UNNotificationResponse,
-                              withCompletionHandler completionHandler: @escaping () -> Void) {
-    let userInfo = response.notification.request.content.userInfo
-    // Print message ID.
-    if let messageID = userInfo[gcmMessageIDKey] {
-      print("Message ID: \(messageID)")
+    
+    // Is caleld when tapping on notification when app is in background
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                didReceive response: UNNotificationResponse,
+                                withCompletionHandler completionHandler: @escaping () -> Void) {
+        let userInfo = response.notification.request.content.userInfo
+        print("Tuck: recieved notificaiton 4: \(response.notification.request.content)")
+        // Print message ID.
+        if let messageID = userInfo[gcmMessageIDKey] {
+            print("Message ID: \(messageID)")
+        }
+        
+        // Print full message.
+        print(userInfo)
+        
+        completionHandler()
     }
-
-    // Print full message.
-    print(userInfo)
-
-    completionHandler()
-  }
 }
 // [END ios_10_message_handling]
 
 extension AppDelegate : MessagingDelegate {
-  // [START refresh_token]
-  func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String) {
-    print("Tuck: Firebase registration token: \(fcmToken)")
-    
-    let dataDict:[String: String] = ["token": fcmToken]
-    NotificationCenter.default.post(name: Notification.Name("FCMToken"), object: nil, userInfo: dataDict)
-    // Note: This callback is fired at each app startup and whenever a new token is generated.
-    
-    // TODO: thread this sleep statement
-    // wait until user is registered to send FCM token
-//    while ApiManager.sharedInstance.patientId == "" {
-//        sleep(1)
-//        print("sleep")
-//    }
-    sendFCMToken(fcmToken: fcmToken)
-  }
-  // [END refresh_token]
-  // [START ios_10_data_message]
-  // Receive data messages on iOS 10+ directly from FCM (bypassing APNs) when the app is in the foreground.
-  // To enable direct data messages, you can set Messaging.messaging().shouldEstablishDirectChannel to true.
-  func messaging(_ messaging: Messaging, didReceive remoteMessage: MessagingRemoteMessage) {
-    print("Received data message: \(remoteMessage.appData)")
-  }
-  // [END ios_10_data_message]
+    // [START refresh_token]
+    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String) {
+        print("Tuck: Firebase registration token: \(fcmToken)")
+        
+        let dataDict:[String: String] = ["token": fcmToken]
+        NotificationCenter.default.post(name: Notification.Name("FCMToken"), object: nil, userInfo: dataDict)
+        // Note: This callback is fired at each app startup and whenever a new token is generated.
+        
+        // TODO: thread this sleep statement
+        // wait until user is registered to send FCM token
+        //    while ApiManager.sharedInstance.patientId == "" {
+        //        sleep(1)
+        //        print("sleep")
+        //    }
+        sendFCMToken(fcmToken: fcmToken)
+    }
+    // [END refresh_token]
+    // [START ios_10_data_message]
+    // Receive data messages on iOS 10+ directly from FCM (bypassing APNs) when the app is in the foreground.
+    // To enable direct data messages, you can set Messaging.messaging().shouldEstablishDirectChannel to true.
+    func messaging(_ messaging: Messaging, didReceive remoteMessage: MessagingRemoteMessage) {
+        print("Received data message: \(remoteMessage.appData)")
+    }
+    // [END ios_10_data_message]
 }
 
 
