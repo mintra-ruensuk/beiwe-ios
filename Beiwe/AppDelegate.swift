@@ -414,6 +414,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
         // TODO: Handle data of notification
         
         print("Tuck: recieved notification 2")
+        log.info("Push notification recieved")
         // Print message ID.
         if let messageID = userInfo[gcmMessageIDKey] {
             print("Message ID: \(messageID)")
@@ -421,8 +422,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
         
         // Print full message.
         print(userInfo)
-        if let survey_id = userInfo["survey_id"] {
-            downloadSurvey(survey_id: survey_id as! String)
+        if let survey_ids = userInfo["survey_ids"] {
+            downloadSurveys()
+            let surveyIds = survey_ids as! [String]
+            for surveyId in surveyIds {
+                log.info("Recieved notification for survey \(surveyId)")
+            }
+            setAvailableSurveys(surveyIds: surveyIds)
         }
         
         completionHandler(UIBackgroundFetchResult.newData)
@@ -432,20 +438,32 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
         let fcmTokenRequest = FCMTokenRequest(fcmToken: fcmToken)
         ApiManager.sharedInstance.makePostRequest(fcmTokenRequest).catch {
             (error) in
-            print("Error registering FCM token: \(error)")
+            log.error("Error registering FCM token: \(error)")
         }
     }
     
-    func downloadSurvey(survey_id: String) {
-        let getSingleSurveyRequest = GetSingleSurveyRequest(surveyID: survey_id)
-        ApiManager.sharedInstance.makePostRequest(getSingleSurveyRequest).done {
-            (arg) in
-            let (body, status) = arg
-            print("Body: \(body), status: \(status)")
+    // downloads all of the surveys in the study
+    func downloadSurveys() {
+        let getSingleSurveyRequest = GetSurveysRequest()
+        log.info("Requesting surveys")
+        ApiManager.sharedInstance.arrayPostRequest(getSingleSurveyRequest).done {
+            (surveys, _) in
+            StudyManager.sharedInstance.currentStudy?.pushSurveys = surveys
+            // set badge number
         } .catch {
             (error) in
-            print("Error downloading survey: \(error)")
+            log.error("Error downloading surveys: \(error)")
         }
+    }
+    
+    func setAvailableSurveys(surveyIds: [String]) {
+        for surveyId in surveyIds {
+            if let survey = StudyManager.sharedInstance.currentStudy?.getSurvey(surveyId: surveyId) {
+                StudyManager.sharedInstance.currentStudy?.availableSurveys[surveyId] = survey
+            }
+        }
+        // set badge number
+            UIApplication.shared.applicationIconBadgeNumber = StudyManager.sharedInstance.currentStudy?.availableSurveys.count as! Int
     }
     
 }

@@ -34,6 +34,8 @@ class Study : ReclineObject {
 
     var surveys: [Survey] = [ ];
     var activeSurveys: [String:ActiveSurvey] = [:]
+    var pushSurveys: [Survey] = [];
+    var availableSurveys: [String:Survey] = [:];
 
 
     var participantConsented: Bool = false;
@@ -78,6 +80,24 @@ class Study : ReclineObject {
         customApiUrl <- map["customApiUrl"]
         fuzzGpsLongitudeOffset <- map["fuzzGpsLongitudeOffset"]
         fuzzGpsLatitudeOffset <- map["fuzzGpsLatitudeOffset"]
+    }
+    
+    func surveyExists(surveyId: String?) -> Bool {
+        for survey in pushSurveys {
+            if survey.surveyId == surveyId {
+                return true
+            }
+        }
+        return false
+    }
+    
+    func getSurvey(surveyId: String?) -> Survey? {
+        for survey in pushSurveys {
+            if survey.surveyId == surveyId {
+                return survey
+            }
+        }
+        return nil
     }
 
 }
