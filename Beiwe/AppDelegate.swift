@@ -423,11 +423,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
         // Print full message.
         print(userInfo)
         if let survey_ids = userInfo["survey_ids"] {
-            downloadSurveys()
             let surveyIds = survey_ids as! [String]
             for surveyId in surveyIds {
-                log.info("Recieved notification for survey \(surveyId)")
+                if !(StudyManager.sharedInstance.currentStudy?.surveyExists(surveyId: surveyId) ?? false) {
+                    log.info("Recieved notification for new survey \(surveyId)")
+                } else {
+                    log.info("Recieved notification for survey \(surveyId)")
+                }
             }
+            downloadSurveys()
             setAvailableSurveys(surveyIds: surveyIds)
         }
         
@@ -463,7 +467,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
             }
         }
         // set badge number
-            UIApplication.shared.applicationIconBadgeNumber = StudyManager.sharedInstance.currentStudy?.availableSurveys.count as! Int
+        UIApplication.shared.applicationIconBadgeNumber = StudyManager.sharedInstance.currentStudy?.availableSurveys.count as! Int
     }
     
 }
