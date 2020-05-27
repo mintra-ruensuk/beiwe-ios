@@ -550,13 +550,13 @@ extension AppDelegate : MessagingDelegate {
         NotificationCenter.default.post(name: Notification.Name("FCMToken"), object: nil, userInfo: dataDict)
         // Note: This callback is fired at each app startup and whenever a new token is generated.
         
-        // TODO: thread this sleep statement
-        // wait until user is registered to send FCM token
-        //    while ApiManager.sharedInstance.patientId == "" {
-        //        sleep(1)
-        //        print("sleep")
-        //    }
-        sendFCMToken(fcmToken: fcmToken)
+        // wait until user is registered to send FCM token, runs on background thread
+        DispatchQueue.global(qos: .background).async {
+            while ApiManager.sharedInstance.patientId == "" {
+                sleep(1)
+            }
+            self.sendFCMToken(fcmToken: fcmToken)
+        }
     }
     // [END refresh_token]
     // [START ios_10_data_message]
