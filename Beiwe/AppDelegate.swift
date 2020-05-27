@@ -423,7 +423,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
         // Print full message.
         print(userInfo)
         if let survey_ids = userInfo["survey_ids"] {
-            let surveyIds = survey_ids as! [String]
+            let surveyIdsString = survey_ids as! String
+            // converts json string to an array of strings
+            let surveyIds = try! JSONDecoder().decode([String].self, from:Data(surveyIdsString.utf8))
             for surveyId in surveyIds {
                 if !(StudyManager.sharedInstance.currentStudy?.surveyExists(surveyId: surveyId) ?? false) {
                     log.info("Recieved notification for new survey \(surveyId)")
@@ -431,8 +433,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
                     log.info("Recieved notification for survey \(surveyId)")
                 }
             }
-            downloadSurveys()
-            setAvailableSurveys(surveyIds: surveyIds)
+            // converting sent_time string into a TimeInterval
+            if let sentTimeString = userInfo["sent_time"] as! String?{
+                let dateFormatter = DateFormatter()
+                dateFormatter.locale = Locale(identifier: "en_US_POSIX") // set locale to reliable US_POSIX
+                dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+                let sentTime = dateFormatter.date(from:sentTimeString)!
+                downloadSurveys(surveyIds: surveyIds, sentTime: sentTime.timeIntervalSince1970)
+            } else {
+                downloadSurveys(surveyIds: surveyIds)
+            }
         }
         
         completionHandler(UIBackgroundFetchResult.newData)
@@ -447,25 +457,37 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
     }
     
     // downloads all of the surveys in the study
-    func downloadSurveys() {
+    func downloadSurveys(surveyIds: [String], sentTime: TimeInterval = 0) {
+        guard let study = StudyManager.sharedInstance.currentStudy else {
+            log.error("Could not find study")
+            return
+        }
         let getSingleSurveyRequest = GetSurveysRequest()
         log.info("Requesting surveys")
-        ApiManager.sharedInstance.arrayPostRequest(getSingleSurveyRequest).done {
-            (surveys, _) in
-            StudyManager.sharedInstance.currentStudy?.pushSurveys = surveys
-            // set badge number
+        ApiManager.sharedInstance.arrayPostRequest(getSingleSurveyRequest).then {
+            (surveys, _) -> Promise<Void> in
+            study.pushSurveys = surveys
+            return Recline.shared.save(study).asVoid();
+        } .map { _ in
+            self.setAvailableSurveys(surveyIds: surveyIds, sentTime: sentTime)
         } .catch {
             (error) in
             log.error("Error downloading surveys: \(error)")
         }
     }
     
-    func setAvailableSurveys(surveyIds: [String]) {
+    func setAvailableSurveys(surveyIds: [String], sentTime: TimeInterval = 0) {
         for surveyId in surveyIds {
             if let survey = StudyManager.sharedInstance.currentStudy?.getSurvey(surveyId: surveyId) {
-                StudyManager.sharedInstance.currentStudy?.availableSurveys[surveyId] = survey
+                let activeSurvey = ActiveSurvey(survey: survey)
+                activeSurvey.received = sentTime
+                activeSurvey.reset(survey)
+                StudyManager.sharedInstance.currentStudy?.activeSurveys[surveyId] = activeSurvey
             }
         }
+        // Emits a surveyUpdated event to the listener
+        StudyManager.sharedInstance.surveysUpdatedEvent.emit(0);
+        
         // set badge number
         UIApplication.shared.applicationIconBadgeNumber = StudyManager.sharedInstance.currentStudy?.availableSurveys.count as! Int
     }
