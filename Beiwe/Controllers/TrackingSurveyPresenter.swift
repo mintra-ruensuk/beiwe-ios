@@ -266,6 +266,7 @@ class TrackingSurveyPresenter : NSObject, ORKTaskViewControllerDelegate {
         return (typeString, optionsString, answersString);
     }
 
+    // stores survey answers on the DataStorage
     func finalizeSurveyAnswers() -> Bool {
         guard let activeSurvey = activeSurvey, let survey = activeSurvey.survey, let surveyId = surveyId, let patientId = StudyManager.sharedInstance.currentStudy?.patientId, let publicKey = StudyManager.sharedInstance.currentStudy?.studySettings?.clientPublicKey else {
             return false;

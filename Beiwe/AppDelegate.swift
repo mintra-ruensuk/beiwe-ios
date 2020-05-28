@@ -469,14 +469,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
             study.pushSurveys = surveys
             return Recline.shared.save(study).asVoid();
         } .map { _ in
-            self.setAvailableSurveys(surveyIds: surveyIds, sentTime: sentTime)
+            self.setActiveSurveys(surveyIds: surveyIds, sentTime: sentTime)
         } .catch {
             (error) in
             log.error("Error downloading surveys: \(error)")
         }
     }
     
-    func setAvailableSurveys(surveyIds: [String], sentTime: TimeInterval = 0) {
+    func setActiveSurveys(surveyIds: [String], sentTime: TimeInterval = 0) {
         for surveyId in surveyIds {
             if let survey = StudyManager.sharedInstance.currentStudy?.getSurvey(surveyId: surveyId) {
                 let activeSurvey = ActiveSurvey(survey: survey)
@@ -489,7 +489,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
         StudyManager.sharedInstance.surveysUpdatedEvent.emit(0);
         
         // set badge number
-        UIApplication.shared.applicationIconBadgeNumber = StudyManager.sharedInstance.currentStudy?.availableSurveys.count as! Int
+        UIApplication.shared.applicationIconBadgeNumber = StudyManager.sharedInstance.currentStudy?.activeSurveys.count as! Int
     }
     
 }

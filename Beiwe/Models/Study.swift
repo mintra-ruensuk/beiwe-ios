@@ -35,7 +35,6 @@ class Study : ReclineObject {
     var surveys: [Survey] = [ ];
     var activeSurveys: [String:ActiveSurvey] = [:]
     var pushSurveys: [Survey] = [];
-    var availableSurveys: [String:ActiveSurvey] = [:];
 
 
     var participantConsented: Bool = false;

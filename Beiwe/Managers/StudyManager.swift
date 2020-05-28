@@ -297,6 +297,8 @@ class StudyManager {
                 trackingSurvey = surveyPresenter!;
             }
             trackingSurvey.finalizeSurveyAnswers();
+            
+            // increment number of submitted surveys
             if (activeSurvey.bwAnswers.count > 0) {
                 if let surveyType = survey.surveyType {
                     switch (surveyType) {
@@ -351,7 +353,6 @@ class StudyManager {
             // you to go back and retake a survey.  also, every time you load the survey to the done page,
             // it resaves a new version of the data in a file.
             if(activeSurvey.survey?.alwaysAvailable ?? false && activeSurvey.isComplete){
-//                print("submitted 1")
                 log.info("ActiveSurvey \(id) expired.");
                 activeSurvey.isComplete = true;
                 surveyDataModified = true;
@@ -364,7 +365,6 @@ class StudyManager {
             //TODO: we need to determine the correct exclusion logic, currently this submits ALL permanent surveys when ANY permanent survey loads.
             // This function gets called whenever you try to display the home page, thus it happens at a very odd time.
             else if (!activeSurvey.isComplete && activeSurvey.expires > 0 && activeSurvey.expires <= currentTime) {
-//                print("submitted 2")
                 log.info("ActiveSurvey \(id) expired.");
                 activeSurvey.isComplete = true;
                 surveyDataModified = true;

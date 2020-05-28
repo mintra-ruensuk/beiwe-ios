@@ -59,7 +59,7 @@ class ActiveSurvey : Mappable {
 
         let numQuestions = survey.randomize ? min(survey.questions.count, survey.numberOfRandomQuestions ?? 999) : survey.questions.count;
         if var order = stepOrder, survey.randomizeWithMemory && numQuestions > 0 {
-            // We must have already asked a bunch of questions, otherwise stepOrder would be nil.  Remvoe them
+            // We must have already asked a bunch of questions, otherwise stepOrder would be nil.  Remove them
             order.removeFirst(min(numQuestions, order.count));
             // remove all in stepOrder that are greater than count.  Could happen if questions are deleted
             // after stepOrder already set...
