@@ -462,9 +462,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
             log.error("Could not find study")
             return
         }
-        let getSingleSurveyRequest = GetSurveysRequest()
+        let getSurveyRequest = GetSurveysRequest()
         log.info("Requesting surveys")
-        ApiManager.sharedInstance.arrayPostRequest(getSingleSurveyRequest).then {
+        ApiManager.sharedInstance.arrayPostRequest(getSurveyRequest).then {
             (surveys, _) -> Promise<Void> in
             study.pushSurveys = surveys
             return Recline.shared.save(study).asVoid();

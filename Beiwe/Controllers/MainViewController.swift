@@ -191,6 +191,12 @@ class MainViewController: UIViewController {
                 self.leaveStudy(self);
             }
         });
+        // TODO: Remove this button
+        actionController.addAction(Action(ActionData(title: "Test Notification"), style: .destructive) { (action) in
+            DispatchQueue.main.async {
+                ApiManager.sharedInstance.arrayPostRequest(TestNotificationRequest());
+            }
+        });
         self.present(actionController, animated: true)
     }
 

@@ -9,9 +9,9 @@
 /* Begin PBXBuildFile section */
 		3248853A2465DD70002F0F81 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 324885392465DD70002F0F81 /* GoogleService-Info.plist */; };
 		3248853C2469ADC3002F0F81 /* FCMTokenRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3248853B2469ADC2002F0F81 /* FCMTokenRequest.swift */; };
-		32611C8E2472EDAD00FB03CA /* TestNotificationRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32611C8D2472EDAC00FB03CA /* TestNotificationRequest.swift */; };
 		32756627245876CC00299A04 /* Private.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32756626245876CC00299A04 /* Private.swift */; };
 		32CEA436246F2579000EBF69 /* GetSingleSurveyRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32CEA435246F2579000EBF69 /* GetSingleSurveyRequest.swift */; };
+		32E1436324869B38009FAE5A /* TestNotificationRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32E1436224869B38009FAE5A /* TestNotificationRequest.swift */; };
 		59912EB3230EF09400CAF7EB /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 59912EB1230EF09400CAF7EB /* Localizable.strings */; };
 		59912EB92311A33A00CAF7EB /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 59912EBB2311A33A00CAF7EB /* InfoPlist.strings */; };
 		831CC5801F79AF6400CDEFB0 /* AppEventManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831CC57F1F79AF6400CDEFB0 /* AppEventManager.swift */; };
@@ -89,13 +89,13 @@
 		1DD23C0F14E88B456D1D8C0A /* Pods-Beiwe.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Beiwe.debug.xcconfig"; path = "Target Support Files/Pods-Beiwe/Pods-Beiwe.debug.xcconfig"; sourceTree = "<group>"; };
 		324885392465DD70002F0F81 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		3248853B2469ADC2002F0F81 /* FCMTokenRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCMTokenRequest.swift; sourceTree = "<group>"; };
-		32611C8D2472EDAC00FB03CA /* TestNotificationRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestNotificationRequest.swift; sourceTree = "<group>"; };
 		32756626245876CC00299A04 /* Private.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Private.swift; sourceTree = "<group>"; };
 		32CEA435246F2579000EBF69 /* GetSingleSurveyRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetSingleSurveyRequest.swift; sourceTree = "<group>"; };
 		32D25F81246EE23E005286EB /* Beiwe2Debug2.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Beiwe2Debug2.entitlements; sourceTree = "<group>"; };
 		32D25F82246EE28F005286EB /* Beiwe2Release2.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Beiwe2Release2.entitlements; sourceTree = "<group>"; };
 		32D25F83246EE294005286EB /* Beiwe2Release.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Beiwe2Release.entitlements; sourceTree = "<group>"; };
 		32D25F84246EE297005286EB /* Beiwe2Debug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Beiwe2Debug.entitlements; sourceTree = "<group>"; };
+		32E1436224869B38009FAE5A /* TestNotificationRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestNotificationRequest.swift; sourceTree = "<group>"; };
 		42A952CE64A464FDCA28DEBD /* Pods-Beiwe.release2.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Beiwe.release2.xcconfig"; path = "Target Support Files/Pods-Beiwe/Pods-Beiwe.release2.xcconfig"; sourceTree = "<group>"; };
 		4D73594BB9D98FBE3AA1E023 /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		59912EB2230EF09400CAF7EB /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Beiwe/Base.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -317,7 +317,7 @@
 				8340ABF41CC7115400D0382F /* ChangePasswordRequest.swift */,
 				3248853B2469ADC2002F0F81 /* FCMTokenRequest.swift */,
 				32CEA435246F2579000EBF69 /* GetSingleSurveyRequest.swift */,
-				32611C8D2472EDAC00FB03CA /* TestNotificationRequest.swift */,
+				32E1436224869B38009FAE5A /* TestNotificationRequest.swift */,
 			);
 			path = API;
 			sourceTree = "<group>";
@@ -669,7 +669,7 @@
 				83C7D37A1CB4E30C00BC7285 /* UploadRequest.swift in Sources */,
 				83C295F61CB8AF160016DD95 /* OneSelection.swift in Sources */,
 				83AF04131CAADE6200A37225 /* StudyManager.swift in Sources */,
-				32611C8E2472EDAD00FB03CA /* TestNotificationRequest.swift in Sources */,
+				32E1436324869B38009FAE5A /* TestNotificationRequest.swift in Sources */,
 				83F6C9681CA0F6CF00B85914 /* PersistentPasswordManager.swift in Sources */,
 				83AF20DA1CA310B100D3DF02 /* EurekaSwiftValidatorComponents.swift in Sources */,
 				831CC5801F79AF6400CDEFB0 /* AppEventManager.swift in Sources */,
