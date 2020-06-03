@@ -466,7 +466,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
         log.info("Requesting surveys")
         ApiManager.sharedInstance.arrayPostRequest(getSurveyRequest).then {
             (surveys, _) -> Promise<Void> in
-            study.pushSurveys = surveys
+            study.surveys = surveys
             return Recline.shared.save(study).asVoid();
         } .map { _ in
             self.setActiveSurveys(surveyIds: surveyIds, sentTime: sentTime)

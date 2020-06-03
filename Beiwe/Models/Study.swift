@@ -34,7 +34,6 @@ class Study : ReclineObject {
 
     var surveys: [Survey] = [ ];
     var activeSurveys: [String:ActiveSurvey] = [:]
-    var pushSurveys: [Survey] = [];
 
 
     var participantConsented: Bool = false;
@@ -82,7 +81,7 @@ class Study : ReclineObject {
     }
     
     func surveyExists(surveyId: String?) -> Bool {
-        for survey in pushSurveys {
+        for survey in surveys {
             if survey.surveyId == surveyId {
                 return true
             }
@@ -91,7 +90,7 @@ class Study : ReclineObject {
     }
     
     func getSurvey(surveyId: String?) -> Survey? {
-        for survey in pushSurveys {
+        for survey in surveys {
             if survey.surveyId == surveyId {
                 return survey
             }
