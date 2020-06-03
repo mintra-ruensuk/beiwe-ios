@@ -280,7 +280,7 @@ class StudyManager {
     }
 
     func cleanupSurvey(_ activeSurvey: ActiveSurvey) {
-        removeNotificationForSurvey(activeSurvey);
+//        removeNotificationForSurvey(activeSurvey);
         if let surveyId = activeSurvey.survey?.surveyId {
             let timingsName = TrackingSurveyPresenter.timingDataType + "_" + surveyId;
             DataStorageManager.sharedInstance.closeStore(timingsName);
@@ -315,16 +315,16 @@ class StudyManager {
         cleanupSurvey(activeSurvey);
     }
 
-    func removeNotificationForSurvey(_ survey: ActiveSurvey) {
-        guard let notification = survey.notification else {
-            return;
-        }
-
-        log.info("Cancelling notification: \(notification.alertBody), \(notification.userInfo)")
-
-        UIApplication.shared.cancelLocalNotification(notification);
-        survey.notification = nil;
-    }
+//    func removeNotificationForSurvey(_ survey: ActiveSurvey) {
+//        guard let notification = survey.notification else {
+//            return;
+//        }
+//
+//        log.info("Cancelling notification: \(notification.alertBody), \(notification.userInfo)")
+//
+//        UIApplication.shared.cancelLocalNotification(notification);
+//        survey.notification = nil;
+//    }
 
     func updateActiveSurveys(_ forceSave: Bool = false) -> TimeInterval {
         log.info("Updating active surveys...")
@@ -362,11 +362,12 @@ class StudyManager {
                 // submitSurvey(activeSurvey)
                 activeSurvey.reset(activeSurvey.survey)
             }
-            //TODO: we need to determine the correct exclusion logic, currently this submits ALL permanent surveys when ANY permanent survey loads.
+            // TODO: we need to determine the correct exclusion logic, currently this submits ALL permanent surveys when ANY permanent survey loads.
             // This function gets called whenever you try to display the home page, thus it happens at a very odd time.
-            else if (!activeSurvey.isComplete && activeSurvey.expires > 0 && activeSurvey.expires <= currentTime) {
+            // If the survey has not been completed, but it is time for the next survey
+            else if (!activeSurvey.isComplete /*&& activeSurvey.nextScheduledTime > 0 && activeSurvey.nextScheduledTime <= currentTime*/) {
                 log.info("ActiveSurvey \(id) expired.");
-                activeSurvey.isComplete = true;
+//                activeSurvey.isComplete = true;
                 surveyDataModified = true;
                 submitSurvey(activeSurvey);
             }
@@ -377,49 +378,56 @@ class StudyManager {
         for survey in study.surveys {
             var next: Double = 0;
             /* Find the next scheduled date that is >= now */
-            outer: for day in 0..<7 {
-                let dayIdx = (day + currentDay) % 7;
-                NSLog("Survey: \(survey.timings)")
-                let timings = survey.timings[dayIdx].sorted()
-
-                for dayTime in timings {
-                    let possibleNxt = dayBegin.addingTimeInterval((Double(day) * 24.0 * 60.0 * 60.0) + Double(dayTime)).timeIntervalSince1970;
-                    if (possibleNxt > currentTime ) {
-                        next = possibleNxt;
-                        break outer
-                    }
-                }
-            }
+//            outer: for day in 0..<7 {
+//                let dayIdx = (day + currentDay) % 7;
+//                NSLog("Survey: \(survey.timings)")
+//                let timings = survey.timings[dayIdx].sorted()
+//
+//                for dayTime in timings {
+//                    let possibleNxt = dayBegin.addingTimeInterval((Double(day) * 24.0 * 60.0 * 60.0) + Double(dayTime)).timeIntervalSince1970;
+//                    if (possibleNxt > currentTime ) {
+//                        next = possibleNxt;
+//                        break outer
+//                    }
+//                }
+//            }
             if let id = survey.surveyId  {
-                if (next > 0) {
-                    closestNextSurveyTime = min(closestNextSurveyTime, next);
-                }
+//                if (next > 0) {
+//                    closestNextSurveyTime = min(closestNextSurveyTime, next);
+//                }
                 allSurveyIds.append(id);
                 /* If we don't know about this survey already, add it in there for TRIGGERONFIRSTDOWNLOAD surverys*/
-                if study.activeSurveys[id] == nil && (survey.triggerOnFirstDownload || next > 0) {
+                if study.activeSurveys[id] == nil && (survey.triggerOnFirstDownload /* || next > 0 */) {
                     log.info("Adding survey  \(id) to active surveys");
-                    study.activeSurveys[id] = ActiveSurvey(survey: survey);
+                    let newActiveSurvey = ActiveSurvey(survey: survey)
+                    newActiveSurvey.reset(survey)
+                    study.activeSurveys[id] = newActiveSurvey
+//                    study.activeSurveys[id] = ActiveSurvey(survey: survey);
                     /* Schedule it for the next upcoming time, or immediately if triggerOnFirstDownload is true */
-                    study.activeSurveys[id]?.expires = survey.triggerOnFirstDownload ? currentTime : next;
-                    study.activeSurveys[id]?.isComplete = true;
-                    log.info("Added survey \(id), expires: \(Date(timeIntervalSince1970: study.activeSurveys[id]!.expires))");
+//                    study.activeSurveys[id]?.nextScheduledTime = survey.triggerOnFirstDownload ? currentTime : next;
+//                    study.activeSurveys[id]?.isComplete = true;
+//                    log.info("Added survey \(id), expires: \(Date(timeIntervalSince1970: study.activeSurveys[id]!.nextScheduledTime))");
                     surveyDataModified = true;
                 }
                 /* We want to display permanent surveys as active, and expect to change some details below (currently identical to the actions we take on a regular active survey) */
                 else if study.activeSurveys[id] == nil && (survey.alwaysAvailable) {
                     log.info("Adding survey  \(id) to active surveys");
-                    study.activeSurveys[id] = ActiveSurvey(survey: survey);
+                    let newActiveSurvey = ActiveSurvey(survey: survey)
+                    newActiveSurvey.reset(survey)
+                    study.activeSurveys[id] = newActiveSurvey
+//                    study.activeSurveys[id] = ActiveSurvey(survey: survey);
                     /* Schedule it for the next upcoming time, or immediately if alwaysAvailable is true */
-                    study.activeSurveys[id]?.expires = survey.alwaysAvailable ? currentTime : next;
-                    study.activeSurveys[id]?.isComplete = true;
-                    log.info("Added survey \(id), expires: \(Date(timeIntervalSince1970: study.activeSurveys[id]!.expires))");
+//                    study.activeSurveys[id]?.nextScheduledTime = survey.alwaysAvailable ? currentTime : next;
+//                    study.activeSurveys[id]?.isComplete = true;
+//                    log.info("Added survey \(id), expires: \(Date(timeIntervalSince1970: study.activeSurveys[id]!.nextScheduledTime))");
                     surveyDataModified = true;
                 }
+                /*
                 if let activeSurvey = study.activeSurveys[id] {
                     /* If it's complete (including surveys we force-completed above) and it's expired, it's time for the next one */
-                    if (activeSurvey.isComplete && activeSurvey.expires <= currentTime && activeSurvey.expires > 0) {
+                    if (activeSurvey.isComplete && activeSurvey.nextScheduledTime <= currentTime && activeSurvey.nextScheduledTime > 0) {
                         activeSurvey.reset(survey);
-                        activeSurvey.received = activeSurvey.expires;
+                        activeSurvey.received = activeSurvey.nextScheduledTime;
                         /*
                         let trackingSurvey: TrackingSurveyPresenter = TrackingSurveyPresenter(surveyId: id, activeSurvey: activeSurvey, survey: survey)
                         trackingSurvey.addTimingsEvent("notified", question: nil)
@@ -464,11 +472,11 @@ class StudyManager {
                         }
 
                     }
-                    if (activeSurvey.expires != next) {
-                        activeSurvey.expires = next;
+                    if (activeSurvey.nextScheduledTime != next) {
+                        activeSurvey.nextScheduledTime = next;
                         surveyDataModified = true;
                     }
-                }
+                } */
             }
         }
 
@@ -481,9 +489,9 @@ class StudyManager {
                 study.activeSurveys.removeValue(forKey: id);
                 surveyDataModified = true;
             } else if (!activeSurvey.isComplete) {
-                if (activeSurvey.expires > 0) {
-                    closestNextSurveyTime = min(closestNextSurveyTime, activeSurvey.expires);
-                }
+//                if (activeSurvey.nextScheduledTime > 0) {
+//                    closestNextSurveyTime = min(closestNextSurveyTime, activeSurvey.nextScheduledTime);
+//                }
                 badgeCnt += 1;
             }
         }

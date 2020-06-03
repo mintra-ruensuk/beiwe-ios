@@ -51,7 +51,8 @@ class TrackingSurveyPresenter : NSObject, ORKTaskViewControllerDelegate {
         timingsStore = DataStorageManager.sharedInstance.createStore(timingsName, headers: TrackingSurveyPresenter.timingsHeaders)
         timingsStore!.sanitize = true;
 
-
+        // TODO: handle if stepOrder is null, throw error if it is not valid
+        //       if it is valid, figure out why and under what conditions
         guard  let stepOrder = activeSurvey.stepOrder /*where questions.count > 0 */ else {
             return;
         }

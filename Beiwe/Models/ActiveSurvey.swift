@@ -13,10 +13,10 @@ class ActiveSurvey : Mappable {
 
     var isComplete: Bool = false;
     var survey: Survey?;
-    var expires: TimeInterval = 0;
+//    var nextScheduledTime: TimeInterval = 0;
     var received: TimeInterval = 0;
     var rkAnswers: Data?;
-    var notification: UILocalNotification?;
+//    var notification: UILocalNotification?;
     var stepOrder: [Int]?;
     var bwAnswers: [String:String] = [:]
 
@@ -32,11 +32,11 @@ class ActiveSurvey : Mappable {
     func mapping(map: Map) {
         isComplete  <- map["is_complete"];
         survey      <- map["survey"];
-        expires     <- map["expires"]
+//        nextScheduledTime     <- map["expires"]
         received    <- map["received"];
         rkAnswers   <- (map["rk_answers"], transformNSData);
         bwAnswers   <- map["bk_answers"]
-        notification    <- (map["notification"], transformNotification);
+//        notification    <- (map["notification"], transformNotification);
         stepOrder   <- map["stepOrder"];
     }
 

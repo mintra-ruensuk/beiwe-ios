@@ -478,10 +478,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
     
     func setActiveSurveys(surveyIds: [String], sentTime: TimeInterval = 0) {
         for surveyId in surveyIds {
-            if let survey = StudyManager.sharedInstance.currentStudy?.getSurvey(surveyId: surveyId) {
+            if let study = StudyManager.sharedInstance.currentStudy, let survey = study.getSurvey(surveyId: surveyId) {
                 let activeSurvey = ActiveSurvey(survey: survey)
                 activeSurvey.received = sentTime
                 activeSurvey.reset(survey)
+                if let surveyType = survey.surveyType {
+                    switch (surveyType) {
+                    case .AudioSurvey:
+                        study.receivedAudioSurveys = (study.receivedAudioSurveys) + 1;
+                    case .TrackingSurvey:
+                        study.receivedTrackingSurveys = (study.receivedTrackingSurveys) + 1;
+                    }
+                }
                 StudyManager.sharedInstance.currentStudy?.activeSurveys[surveyId] = activeSurvey
             }
         }
