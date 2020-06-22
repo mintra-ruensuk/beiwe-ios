@@ -42,7 +42,8 @@ class RegisterViewController: FormViewController {
             cell.textLabel?.font = font
             cell.detailTextLabel?.font = font;
         }
-        let configServer = Configuration.sharedInstance.settings["config-server"] as? Bool ?? false;
+//        let configServer = Configuration.sharedInstance.settings["config-server"] as? Bool ?? false;
+        let configServer = true
         var section = Section("Register for Study")
         if (configServer) {
             section = section <<< SVURLRow("server") {
@@ -50,6 +51,7 @@ class RegisterViewController: FormViewController {
                 $0.placeholder = "Server Address";
                 $0.rules = [RequiredRule()]
                 $0.autoValidation = autoValidation
+                $0.value = "192.168.0.15:8080"
             }
         }
         section = section <<< SVAccountRow("patientId") {
@@ -57,12 +59,14 @@ class RegisterViewController: FormViewController {
                 $0.placeholder = "User ID";
                 $0.rules = [RequiredRule()]
                 $0.autoValidation = autoValidation
+                $0.value = "1ocks6pi"
             }
             <<< SVPasswordRow("tempPassword") {
                 $0.title = "Temporary Password:"
                 $0.placeholder = "Temp Password";
                 $0.rules = [RequiredRule()]
                 $0.autoValidation = autoValidation
+                $0.value = "5cczzlov"
             }
             /*
             <<< SVSimplePhoneRow("phone") {
@@ -77,26 +81,28 @@ class RegisterViewController: FormViewController {
                 $0.placeholder = "New password";
                 $0.rules = [RequiredRule(), RegexRule(regex: Constants.passwordRequirementRegex, message: Constants.passwordRequirementDescription)]
                 $0.autoValidation = autoValidation
+                $0.value = "qwerty09877"
             }
             <<< SVPasswordRow("confirmPassword") {
                 $0.title = "Confirm Password:"
                 $0.placeholder = "Confirm Password";
                 $0.rules = [RequiredRule(), MinLengthRule(length: 1)]
                 $0.autoValidation = autoValidation
+                $0.value = "qwerty09877"
             }
             <<< SVSimplePhoneRow("clinicianPhone") {
                 $0.title = "Primary Researcher Phone:"
                 $0.placeholder = "10 digit number";
                 $0.rules = [RequiredRule(), PhoneNumberRule()]
                 $0.autoValidation = autoValidation
-
+                $0.value = "1234567890"
             }
             <<< SVSimplePhoneRow("raPhone") {
                 $0.title = "Research Asst. Phone:"
                 $0.placeholder = "10 digit number";
                 $0.rules = [RequiredRule(), PhoneNumberRule()]
                 $0.autoValidation = autoValidation
-
+                $0.value = "1234567890"
             }
             <<< ButtonRow() {
                 $0.title = "Register"
@@ -121,7 +127,8 @@ class RegisterViewController: FormViewController {
                             server = formValues["server"] as! String?;
                         }
                         if let server = server {
-                            customApiUrl = "https://" + server
+//                            customApiUrl = "https://" + server
+                            customApiUrl = "http://" + server
                         }
                         if let patientId = patientId, let phoneNumber = phoneNumber, let newPassword = newPassword, let clinicianPhone = clinicianPhone, let raPhone = raPhone {
                             let registerStudyRequest = RegisterStudyRequest(patientId: patientId, phoneNumber: phoneNumber, newPassword: newPassword)
