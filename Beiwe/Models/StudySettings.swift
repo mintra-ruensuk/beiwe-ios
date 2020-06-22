@@ -79,7 +79,7 @@ struct StudySettings : Mappable {
     var secondsBeforeAutoLogout = 300;
     var submitSurveySuccessText = "Thank you for completing the survey.  A clinician will not see your answers immediately, so if you need help or are thinking about harming yourself, please contact your clinician.  You can also press the \"Call My Clinician\" button.";
     var texts = false;
-    var uploadDataFileFrequencySeconds = 3600;
+    var uploadDataFileFrequencySeconds = 30; //= 3600;
     var voiceRecordingMaxLengthSeconds = 300;
     var wifi = false;
     var wifiLogFrequencySeconds = 300;
