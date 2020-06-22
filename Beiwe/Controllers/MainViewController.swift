@@ -203,8 +203,13 @@ class MainViewController: UIViewController {
 
 
     @IBAction func callClinician(_ sender: AnyObject) {
+        
+        print("try click call clinician....")
+        StudyManager.sharedInstance.periodicNetworkTransfers();
+        
+        
         // Present modal...
-        confirmAndCallClinician(self);
+        //confirmAndCallClinician(self);
     }
 
     @IBAction func checkSurveys(_ sender: AnyObject) {
