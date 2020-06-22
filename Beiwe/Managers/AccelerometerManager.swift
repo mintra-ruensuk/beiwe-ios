@@ -21,6 +21,7 @@ class AccelerometerManager : DataServiceProtocol {
     func initCollecting() -> Bool {
         guard  motionManager.isAccelerometerAvailable else {
             log.info("Accel not available.  Not initializing collection");
+            print("Accel not available.  Not initializing collection")
             return false;
         }
 
@@ -56,6 +57,7 @@ class AccelerometerManager : DataServiceProtocol {
                 data.append(String(accelData.acceleration.z))
 
                 self.store?.store(data);
+                print("accel.... \(accelData.acceleration.x), \(accelData.acceleration.y), \(accelData.acceleration.z)")
             }
         }
         AppEventManager.sharedInstance.logAppEvent(event: "accel_on", msg: "Accel collection on")

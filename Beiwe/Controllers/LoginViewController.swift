@@ -33,7 +33,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
         }
 
         password.delegate = self
-        loginButton.isEnabled = false;
+        loginButton.isEnabled = true;
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tap))
         view.addGestureRecognizer(tapGesture)
 
@@ -133,6 +133,8 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
     */
 
     @IBAction func callClinician(_ sender: AnyObject) {
+//        print("try click call clinician....")
+//        StudyManager.sharedInstance.periodicNetworkTransfers();
         confirmAndCallClinician(self);
     }
 

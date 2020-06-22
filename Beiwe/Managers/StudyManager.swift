@@ -243,10 +243,11 @@ class StudyManager {
     }
 
     func periodicNetworkTransfers() {
+        print("periodicNetworkTransfers...")
         guard let currentStudy = currentStudy, let studySettings = currentStudy.studySettings else {
             return;
         }
-
+        print("periodicNetworkTransfers...111")
         let reachable = studySettings.uploadOverCellular ? self.appDelegate.reachability!.isReachable : self.appDelegate.reachability!.isReachableViaWiFi
 
         // Good time to compact the database
@@ -254,6 +255,7 @@ class StudyManager {
         let nextSurvey = currentStudy.nextSurveyCheck ?? 0;
         let nextUpload = currentStudy.nextUploadCheck ?? 0;
         if (currentTime > nextSurvey || (reachable && currentStudy.missedSurveyCheck)) {
+            print("survey..")
             /* This will be saved because setNextUpload saves the study */
             currentStudy.missedSurveyCheck = !reachable
             self.setNextSurveyTime().then { _ -> Void in
@@ -265,6 +267,7 @@ class StudyManager {
             }
         }
         else if (currentTime > nextUpload || (reachable && currentStudy.missedUploadCheck)) {
+            print("uploaddd...")
             /* This will be saved because setNextUpload saves the study */
             currentStudy.missedUploadCheck = !reachable
             self.setNextUploadTime().then { _ -> Void in
@@ -571,7 +574,8 @@ class StudyManager {
 
         return (type: type, timestamp: timestamp, ext: pathExtention ?? "")
     }
-
+    
+    //ล้างค่าข้อมูลหลังจากอัพโหลด?
     func purgeUploadData(_ fileList: [String:Int64], currentStorageUse: Int64) -> Promise<Void> {
         var used = currentStorageUse
         return Promise().then(on: DispatchQueue.global(qos: .default)) {
