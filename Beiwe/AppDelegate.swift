@@ -16,6 +16,7 @@ import ResearchKit;
 import PermissionScope
 import XCGLogger
 import EmitterKit
+import UserNotifications
 
 let log = XCGLogger(identifier: "advancedLogger", includeDefaultDestinations: false)
 
@@ -76,15 +77,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         AppEventManager.sharedInstance.didLaunch(launchOptions: launchOptions);
 
 
-        pscope.addPermission(NotificationsPermission(notificationCategories: nil),
-                             message: "Allows Beiwe to send you survey notifications.")
-        pscope.addPermission(LocationAlwaysPermission(),
-                             message: "Beiwe needs this for the data gathering capabilities of the application.")
-        pscope.headerLabel.text = ""
-        pscope.bodyLabel.text = "Beiwe needs access to your location and notifications.";
+//        pscope.addPermission(NotificationsPermission(notificationCategories: nil),
+//                             message: "Allows Beiwe to send you survey notifications.")
+//        pscope.addPermission(LocationAlwaysPermission(),
+//                             message: "Beiwe needs this for the data gathering capabilities of the application.")
+//        pscope.headerLabel.text = ""
+//        pscope.bodyLabel.text = "Beiwe needs access to your location and notifications.";
         //pscope.bodyLabel.font = pscope.bodyLabel.font.fontWithSize(10);
         //pscope.bodyLabel.sizeToFit();
-
+        
+        registerForPushNotifications()
         do {
             reachability = try Reachability()
             try reachability!.startNotifier()
@@ -339,6 +341,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func crash() {
         Crashlytics.sharedInstance().crash()
+    }
+    
+    func registerForPushNotifications() {
+        if #available(iOS 10.0, *) {
+            UNUserNotificationCenter.current() // 1
+                .requestAuthorization(options: [.alert, .sound, .badge]) { // 2
+                    granted, error in
+                    print("Permission granted: \(granted)") // 3
+            }
+        } else {
+            // Fallback on earlier versions
+        }
     }
 
 
