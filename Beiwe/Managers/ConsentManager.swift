@@ -156,7 +156,8 @@ class ConsentManager : NSObject, ORKTaskViewControllerDelegate {
     }
 
     func hasRequiredPermissions() -> Bool {
-        return (pscope.statusNotifications() == .authorized && pscope.statusLocationAlways() == .authorized);
+        return true
+//        return (pscope.statusNotifications() == .authorized && pscope.statusLocationAlways() == .authorized);
     }
 
     /* ORK Delegates */
